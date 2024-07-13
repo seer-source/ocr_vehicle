@@ -1,0 +1,99 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-example1 pt-2">
+        <li class="breadcrumb-item"><a href="/"></a>الشفتات</li>
+        <li class="breadcrumb-item active" aria-current="page">اضافة نوع تصريح</li>
+    </ol>
+
+</nav>
+
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            اضافة نوع تصريح
+        </div>
+        <div class="prism-toggle">
+
+            <!-- <button class="btn btn-sm btn-primary-light">اضافة شفت</button> -->
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {%csrf_token%}
+            {% if form.errors %}
+            {% for field, error_list in form.errors.items %}
+            <div class="alert alert-outline-danger rounded-pill alert-dismissible fade show">
+              {{ field }}: {{ error_list.0 }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="bi bi-x"></i></button>
+        </div>
+                {% endfor %}
+        {% endif %}
+            <div class="row g-3">
+                <div class="form-group col-12 col-md-6">
+                    <label for="name">اسم الاذن</label>
+                    {{form.name}}
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label for="fromm">من</label>
+                    {{form.fromm}}
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label for="too">الي</label>
+                    {{form.too}}
+                </div>
+                <div class="form-group col-12 col-md-6">
+                    <label for="num_reason">عدد الازونات لكل موظف خلال الشهر</label>
+                    {{form.num_reason}}
+                </div>
+                
+                <div class="col-12 col-md-6 row align-items-center ps-4 pt-2">
+                    {% for radio in form.when %}
+                    <div class="form-check form-check-md col-6">
+                      <input id="input{{radio.choice_label}}" type="radio" class="form-check-input" name="{{ form.when.name }}" value="{{ radio.choice_label }}" {% if form.when.value != "" %}  {% if radio.choice_label == form.when.value %}checked{% endif %} {% else %}  {% if radio.choice_label == 'الدخول' %}checked{% endif %} {% endif %}>
+                      <label for="input{{radio.choice_label}}" class="form-check-label">{{radio.choice_label}}</label>
+                  </div>
+                  {% endfor %}
+              </div>
+              <div  class="col-12 form-group">
+                <label for="persons">الموظفون</label>
+                {{form.persions}}
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">حفظ</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    const multipleCancelButton = new Choices(
+        '#assigned-team-members',
+        {
+            allowHTML: true,
+            removeItemButton: true,
+        }
+    );
+</script>
+<script>
+    function release() {
+      $.ajax({
+        url: "/cameras/release/",
+        type: "GET",
+        success: function (data) {
+  
+        },
+        error: function (xhr, status, error) {
+  
+          console.error(error);
+        }
+      });
+    }
+    
+  release()
+    
+  </script>
+{% endblock %}

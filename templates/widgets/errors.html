@@ -1,0 +1,8 @@
+{% if form.errors %}
+        {% for field, error_list in form.errors.items %}
+        <div class="alert alert-outline-danger rounded-pill alert-dismissible fade show">
+          {{ field }}: {{ error_list.0 }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="bi bi-x"></i></button>
+    </div>
+            {% endfor %}
+    {% endif %}

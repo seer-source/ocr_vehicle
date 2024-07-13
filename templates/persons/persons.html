@@ -1,0 +1,169 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb breadcrumb-example1 pt-2">
+    <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+    <li class="breadcrumb-item active" aria-current="page"> الاشخاص</li>
+  </ol>
+</nav>
+<div class="card custom-card">
+  <div class="card-header justify-content-between">
+    <div class="card-title">
+      الاشخاص
+    </div>
+    <div class="prism-toggle">
+      <!-- <button class="btn btn-sm btn-primary-light">Show Code<i
+          class="ri-code-line ms-2 d-inline-block align-middle"></i></button> -->
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+        <table id="datatable-basic" class="table table-bordered text-nowrap w-100">
+              <thead>
+                  <tr>
+                      <th style="width: 1%">
+                          رقم القيد
+                      </th>
+                      <th style="width: 20%">
+                          Person Name
+                      </th>
+                      <th style="width: 20%">
+                         Images
+                      </th>
+                      <th>
+                         gender
+                      </th>
+                      <th style="width: 8%" class="text-center">
+                          Status
+                      </th>
+                      <th style="width: 30%">
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                 {% for person in persons %}
+                  <tr>
+                      <td>
+                          {{ person.registration_number }}
+                      </td>
+                      <td>
+                          <a>
+                              {{ person.name }}
+                          </a>
+                          <br/>
+                          <small>
+                              {{ person.create_at }}
+                          </small>
+                      </td>
+                      <td>
+                          <ul class="list-inline">
+                              <li class="list-inline-item">
+                                  <img alt="Avatar" class="avatar avatar-rounded" src="http://127.0.0.1:8000/media/{{person.image}}">
+                              </li>
+
+                          </ul>
+                      </td>
+                      <td>
+                          {{ person.gender }}
+                      </td>
+                      <td class="project-state">
+                        {% if person.status == 'whitelist' %}
+      <span class="">{{ person.status }}</span>
+
+    {% else %}
+        <span class="">{{ person.status }}</span>
+    {% endif %}
+                      </td>
+                      <td class="project-actions text-right">
+                          <a class="btn btn-primary btn-sm" href="{% url 'view_person' person.id %}">
+                              <i class="fas fa-folder">
+                              </i>
+                              View
+                          </a>
+                          <a class="btn btn-info btn-sm" href="{% url 'edit_person' person.id %}">
+                              <i class="fas fa-pencil-alt">
+                              </i>
+                              Edit
+                          </a>
+                          <a class="btn btn-danger btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#modal-delete{{person.id}}">
+                              Delete
+                          </a>
+
+                          <div class="modal fade" id="modal-delete{{person.id}}" data-bs-backdrop="static"
+    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="staticBackdropLabel">Delete Person
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="text-center">are you sure to delete {{person.name}} ?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+                <a href="{% url 'delete_person' person.id %}" class="btn btn-primary">delete</a>
+            </div>
+        </div>
+    </div></div>
+                    
+                      </td>
+                  </tr>
+              {% endfor %}
+
+              </tbody>
+          </table>
+          </div>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Datatables Cdn -->
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- Internal Datatables JS -->
+<script src="{% static 'dist/js/datatables.js' %}"></script>
+<script>
+    function release() {
+      $.ajax({
+        url: "/cameras/release/",
+        type: "GET",
+        success: function (data) {
+  
+        },
+        error: function (xhr, status, error) {
+  
+          console.error(error);
+        }
+      });
+    }
+    
+  release()
+    
+  </script>
+{% endblock %}

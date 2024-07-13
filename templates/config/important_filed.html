@@ -1,0 +1,87 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+{% endblock %}
+{% block content %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-example1 pt-2">
+        <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+        <li class="breadcrumb-item active" aria-current="page">تحميل ملفات ال db</li>
+    </ol>
+</nav>
+
+
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+           اعدادات النظام
+        </div>
+        <div class="prism-toggle">
+          
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post" class="row g-3">
+            {%csrf_token%}
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <label for="input-time" class="form-label">وقت بدا العمل</label>
+                {{form.time_start_working}}
+                
+            </div>
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <label for="input-number" class="form-label">عدد ساعات العمل</label>
+                {{form.num_hour_working}}
+            </div>
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <label for="input-number" class="form-label">الفترة المسموحة لتنفيذ التصريح</label>
+                {{form.num_end_permission}}
+            </div>
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">عنوان ip البطاقة الامامية</label>
+                {{form.url_extract_data}}
+            </div>
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">عنوان ip البطاقة الخلفية </label>
+                {{form.url_extract_data_back}}
+            </div>
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">عنوان ip تحميل الصورة</label>
+                {{form.url_image}}
+            </div>
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label"> token whatsapp</label>
+                {{form.token_access}}
+            </div>
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label"> url whatapp</label>
+                {{form.url_whatsapp}}
+            </div>
+            <!-- <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12"></div> -->
+            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12" style="margin-top: 40px;">
+            <button type="submit" class="btn btn-primary">حفظ</button>
+            </div>
+           </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    function release() {
+      $.ajax({
+        url: "/cameras/release/",
+        type: "GET",
+        success: function (data) {
+  
+        },
+        error: function (xhr, status, error) {
+  
+          console.error(error);
+        }
+      });
+    }
+    
+  release()
+    
+  </script>
+{% endblock %}

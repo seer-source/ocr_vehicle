@@ -1,0 +1,141 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+<link rel="stylesheet" href="{% static 'dist/libs/flatpickr/flatpickr.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/prismjs/themes/prism-coy.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond/filepond.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/choices.js/public/assets/styles/choices.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond-plugin-image-edit/filepond-plugin-image-edit.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/dropzone/dropzone.css' %}">
+
+{% endblock %}
+{% block content %}
+{% for camera in cameras %}
+            {% include 'models/camera_capture_model.html' with id=camera.id name=camera.name %}
+{% endfor %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-example1 pt-2">
+      <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Sarch Id</li>
+    </ol>
+  </nav>
+  <div class="card custom-card">
+    <div class="card-header justify-content-between">
+      <div class="card-title">
+      البحث بصورة الشخص
+      </div>
+      <div class="prism-toggle">
+        <!-- <button class="btn btn-sm btn-primary-light">Show Code<i
+            class="ri-code-line ms-2 d-inline-block align-middle"></i></button> -->
+      </div>
+    </div>
+    <div class="card-body">
+      <form  style="display: none;" data-single="true" method="post" action="https://httpbin.org/post" class="dropzone"></form>
+          <form  method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.errors %}
+            <div class="alert alert-danger">
+              <strong>Error(s) in the form:</strong>
+              <ul>
+                {% for field in form %}
+                {% for error in field.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+            <div class="row d-flex justify-content-center align-items-center">
+              <div class="card-body col-12 col-md-4">
+                <div class="form-group w-50 mx-auto">
+                 
+                  
+                  <div class="col-xl-12">
+                    <div class="card custom-card">
+                        <div class="card-header d-flex justify-content-between">
+                            <div class="card-title">
+                            صورة الشخص
+                            </div>
+                            {% include 'widgets/camera_drop_down_list.html' %}
+                        </div>
+                        <div class="card-body">
+                          {{form.frontImage}}
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="form-group w-50 mx-auto">
+                <button class="btn btn-primary mt-3">Serach</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'dist/js/validation.js' %}"></script>
+<script src="{% static 'dist/libs/flatpickr/flatpickr.min.js' %}"></script>
+<script src="{% static 'dist/js/date&time_pickers.js' %}"></script>
+<script src="{% static 'dist/libs/prismjs/prism.js' %}"></script>
+<script src="{% static 'dist/js/prism-custom.js' %}"></script>
+
+    <script src="{% static 'dist/libs/filepond/filepond.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-edit/filepond-plugin-image-edit.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-crop/filepond-plugin-image-crop.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-resize/filepond-plugin-image-resize.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-transform/filepond-plugin-image-transform.min.js' %}"></script>
+    <script src="{% static 'dist/libs/dropzone/dropzone-min.js' %}"></script>
+    {% comment %} <script src="{% static 'dist/js/fileupload.js' %}"></script> {% endcomment %}
+    <script>
+      FilePond.registerPlugin(
+        FilePondPluginImagePreview,
+        FilePondPluginImageExifOrientation,
+        FilePondPluginFileValidateSize,
+        FilePondPluginFileEncode,
+        FilePondPluginImageEdit,
+        FilePondPluginFileValidateType,
+        FilePondPluginImageCrop,
+        FilePondPluginImageResize,
+        FilePondPluginImageTransform
+    );
+   const filePond= FilePond.create(
+        document.querySelector('.single-fileupload'),
+        {
+            labelIdle: `Drag & Drop your picture or <span class="filepond--label-action">Browse</span>`,
+            imagePreviewHeight: 170,
+            imageCropAspectRatio: '1:1',
+            imageResizeTargetWidth: 200,
+            imageResizeTargetHeight: 200,
+            stylePanelLayout: 'compact circle',
+            styleLoadIndicatorPosition: 'center bottom',
+            styleButtonRemoveItemPosition: 'center bottom'
+        }
+    );
+      $('#captureImage').click(function (event) {
+        event.preventDefault();
+        $.ajax({
+          url: '/cameras/capture_image/',
+          type: 'GET',
+          xhrFields: {
+            responseType: 'blob'
+          },
+          success: function (response) {
+            file=convert_blob_to_file(response)
+            filePond.addFile(file)
+          },
+          error: function (error) {
+            console.log(error);
+          }
+        });
+      });
+    </script>
+{% endblock %}

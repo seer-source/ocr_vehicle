@@ -1,0 +1,331 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/fontawesome-free/css/all.min.css' %}">
+<!-- icheck bootstrap -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+<!-- Theme style -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/daterangepicker/daterangepicker.css' }">
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.min.css' %}">
+<!-- Google Font: Source Sans Pro -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/fontawesome-free/css/all.min.css' %}">
+<!-- Ionicons -->
+<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+<!-- Tempusdominus Bootstrap 4 -->
+<link rel="stylesheet"
+    href="{% static 'AdminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+<!-- iCheck -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+<!-- JQVMap -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/jqvmap/jqvmap.min.css' %}">
+<!-- Theme style -->
+<link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte.min.css' %}">
+<!-- overlayScrollbars -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+<!-- Daterange picker -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/daterangepicker/daterangepicker.css' %}">
+<!-- summernote -->
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/summernote/summernote-bs4.min.css' %}">
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'AdminLTE/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="content-wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>dashboard</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">DASHBOARD</a></li>
+                        <li class="breadcrumb-item active">dashboard</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+            <form method="post" class="row g-3">
+                {%csrf_token%}
+                <div class="form-group col-12 col-md-4">
+                    <label>Date range:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="far fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <!-- <input type="text" class="form-control float-right" id="reservation"> -->
+                        {{form.date_rang}}
+                    </div>
+                    <!-- /.input group -->
+                </div>
+                <div class="form-group col-12 col-md-4">
+                    <label>Department</label>
+                    {{form.department}}
+                </div>
+                <div class="form-group col-12 col-md-4">
+                    <label>Type</label>
+                    {{form.type}}
+                </div>
+                <div class="form-group col-12 col-md-4">
+                    <label>Visitors type</label>
+                    {{form.typeVisitor}}
+                </div>
+                <div class="form-group col-12 col-md-4">
+                    <label>Reason</label>
+                    {{form.reason}}
+                </div>
+                <div class="form-group col-12 col-md-4">
+                    <label>Other</label>
+                    {{form.other}}
+                </div>
+                <button class="btn btn-primary col-12 col-md-4 mx-auto" type="submit">
+                    search
+                </button>
+            </form>
+            <div class="row g-4 mt-4">
+                <div class="col-12 col-md-6">
+                    <!-- small box -->
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3>{{current_visitor}}</h3>
+
+                            <p>Current Visitors Count</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-person-add"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <!-- small box -->
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3>{{avg_visitor}}<sup style="font-size: 20px">%</sup></h3>
+                            <p>Avarage Visitors Count</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <!-- small box -->
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3>{{women_count}}</h3>
+
+                            <p>Women Count</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-person"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <!-- small box -->
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3>{{men_count}}</h3>
+
+                            <p>Men Count</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-person"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="tab-content p-0">
+                        <div class="chart tab-pane active" id="revenue-chart"
+                            style="position: relative; height: 300px;">
+                            <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent d-none">
+                <div class="row">
+                    <div class="col-4 text-center">
+                        <div id="sparkline-1"></div>
+                        <div class="text-white">Visitors</div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-4 text-center">
+                        <div id="sparkline-2"></div>
+                        <div class="text-white">Online</div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-4 text-center">
+                        <div id="sparkline-3"></div>
+                        <div class="text-white">Sales</div>
+                    </div>
+                    <!-- ./col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <div class="card">
+                
+                <!-- /.card-header -->
+                <div class="card-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>National ID</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for person in persons %}
+                            <tr>
+                                <td>{{person.name}}</td>
+                                <td>{{person.id_national}}</td>
+                                <td>{{person.created_at}}</td>
+                                <td class="text-center">
+                                    <a class="btn btn-primary btn-sm " href="{% url 'view_person' person.id %}">
+                                        <i class="fas fa-folder">
+                                        </i>
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                          
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                    <th>Name</th>
+                                    <th>National ID</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+
+    </section>
+    {% endblock %}
+    {% block scripts %}
+    <script src="{% static 'AdminLTE/plugins/daterangepicker/daterangepicker.js' %}"></script>
+
+    <script src="{% static 'AdminLTE/plugins/jquery/jquery.min.js' %}"></script>
+    <!-- jQuery UI 1.11.4 -->
+    <script src="{% static 'AdminLTE/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <!-- Bootstrap 4 -->
+    <script src="{% static 'AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- ChartJS -->
+    <script src="{% static 'AdminLTE/plugins/chart.js/Chart.min.js' %}"></script>
+    <!-- Sparkline -->
+    <script src="{% static 'AdminLTE/plugins/sparklines/sparkline.js' %}"></script>
+    <!-- JQVMap -->
+    <script src="{% static 'AdminLTE/plugins/jqvmap/jquery.vmap.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+    <!-- jQuery Knob Chart -->
+    <script src="{% static 'AdminLTE/plugins/jquery-knob/jquery.knob.min.js' %}"></script>
+    <!-- daterangepicker -->
+    <script src="{% static 'AdminLTE/plugins/moment/moment.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script
+        src="{% static 'AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+    <!-- Summernote -->
+    <script src="{% static 'AdminLTE/plugins/summernote/summernote-bs4.min.js' %}"></script>
+    <!-- overlayScrollbars -->
+    <script src="{% static 'AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+    <!-- AdminLTE App -->
+    <script src="{% static 'AdminLTE/dist/js/adminlte.js' %}"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="{% static 'AdminLTE/dist/js/demo.js' %}"></script>
+    <!-- <script src="{% static 'AdminLTE/dist/js/pages/dashboard.js' %}"></script> -->
+    <script src="{% static 'AdminLTE/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/jszip/jszip.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/pdfmake/pdfmake.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/pdfmake/vfs_fonts.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+    <!-- AdminLTE App -->
+    <script src="{% static 'AdminLTE/dist/js/adminlte.min.js' %}"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="{% static 'AdminLTE/dist/js/demo.js' %}"></script>
+    <script src="{% static 'AdminLTE/plugins/select2/js/select2.full.min.js' %}"></script>
+    <script>
+        $(function () {
+            $("#example1").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            $.widget.bridge('uibutton', $.ui.button)
+            $('#reservation').daterangepicker()
+            $('.select2').select2()
+
+            var salesChartCanvas = document.getElementById('revenue-chart-canvas').getContext('2d');
+            var salesChartData = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Des'],
+                datasets: [
+                    {
+                        label: 'Digital Goods',
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: false,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data: JSON.parse('{{ months_counts|safe }}')
+                    }
+                ]
+            }
+            var salesChartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false
+                        }
+                    }]
+                }
+            }
+            var salesChart = new Chart(salesChartCanvas, {
+                type: 'line',
+                data: salesChartData,
+                options: salesChartOptions
+            })
+        });
+    </script>
+    {% endblock %}

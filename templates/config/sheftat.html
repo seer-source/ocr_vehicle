@@ -1,0 +1,101 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-example1 pt-2">
+        <li class="breadcrumb-item"><a href="/">الاعدادات</a></li>
+        <li class="breadcrumb-item active" aria-current="page">الشفتات</li>
+    </ol>
+    
+</nav>
+
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            الاشخاص
+        </div>
+        <div class="prism-toggle">
+            <a href="{% url 'add_sheftat' %}" class="btn btn-sm btn-primary-light">اضافة شفت</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="datatable-basic" class="table table-bordered text-nowrap w-100">
+                <thead>
+                    <th>#</th>
+                    <th>الاسم</th>
+                    <th>بدأ العمل</th>
+                    <th>عدد الساعات</th>
+                    <th>action</th>
+                </thead>
+                <tbody>
+                    {% for sheft in sheftat %}
+                    <tr>
+                    <td>{{sheft.id}}</td>
+                    <td>{{sheft.name}}</td>
+                    <td>{{sheft.time_start_working}}</td>
+                    <td>{{sheft.num_hour_working}}</td>
+                    <td>
+                        <a class="btn btn-info btn-sm" href="{% url 'edit_sheft' sheft.id %}">
+                            <i class="fas fa-pencil-alt">
+                            </i>
+                            تعديل
+                        </a>
+                        <a class="btn btn-danger btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#modal-delete{{sheft.id}}">
+                            حذف
+                        </a>
+
+                        <div class="modal fade" id="modal-delete{{sheft.id}}" data-bs-backdrop="static"
+  data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h6 class="modal-title" id="staticBackdropLabel">مسح الشفت
+              </h6>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-center">are you sure to delete {{sheft.name}} ?</p>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">اغلاق</button>
+              <a href="{% url 'delete_sheft' sheft.id %}" class="btn btn-primary">مسح</a>
+          </div>
+      </div>
+  </div></div>
+                    </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+<script>
+    function release() {
+      $.ajax({
+        url: "/cameras/release/",
+        type: "GET",
+        success: function (data) {
+  
+        },
+        error: function (xhr, status, error) {
+  
+          console.error(error);
+        }
+      });
+    }
+    
+  release()
+    
+  </script>
+{% endblock %}

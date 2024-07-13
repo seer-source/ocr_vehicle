@@ -1,0 +1,211 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+<link rel="stylesheet" href="{% static 'dist/libs/tabulator/dist/css/tabulator_midnight.min.css' %}">
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb breadcrumb-example1 pt-2">
+    <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+    <li class="breadcrumb-item active" aria-current="page">التقارير</li>
+  </ol>
+</nav>
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+      <div class="card-title">
+        التقارير
+      </div>
+      <div class="prism-toggle">
+        <div class="form-group">
+            <div class="input-group">
+                <button type="submit" class="btn btn-primary" id="ajax-trigger">بحث</button>
+                <div class="input-group-text text-muted"><i class="ri-calendar-line"></i>  </div>
+                <input type="text" class="form-control" id="daterange" placeholder="Date range picker">
+            
+            </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+       
+        <div>
+            <button class="btn btn-primary" id="printtable">طباعة</button>
+            <button class="btn btn-primary" id="download-csv">تمحيل CSV</button>
+            <button class="btn btn-primary" id="download-xlsx">تحميل XLSX</button>
+           
+        </div>
+<div id="example-table"></div>
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
+<script src="{% static 'dist/libs/tabulator/dist/js/tabulator.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.20/jspdf.plugin.autotable.min.js"></script>
+<script src="{% static 'dist/libs/flatpickr/flatpickr.min.js' %}"></script>
+<script src="{% static 'dist/js/date&time_pickers.js' %}"></script>
+<script>
+//Build Tabulator
+
+$(function(){
+
+    var minMaxFilterEditor = function(cell, onRendered, success, cancel, editorParams){
+
+var end;
+
+var container = document.createElement("span");
+
+//create and style inputs
+var start = document.createElement("input");
+start.setAttribute("type", "number");
+start.setAttribute("placeholder", "Min");
+start.setAttribute("min", 0);
+start.setAttribute("max", 100);
+start.style.padding = "4px";
+start.style.width = "50%";
+start.style.boxSizing = "border-box";
+
+start.value = cell.getValue();
+
+function buildValues(){
+    success({
+        start:start.value,
+        end:end.value,
+    });
+}
+
+function keypress(e){
+    if(e.keyCode == 13){
+        buildValues();
+    }
+
+    if(e.keyCode == 27){
+        cancel();
+    }
+}
+
+end = start.cloneNode();
+end.setAttribute("placeholder", "Max");
+
+start.addEventListener("change", buildValues);
+start.addEventListener("blur", buildValues);
+start.addEventListener("keydown", keypress);
+
+end.addEventListener("change", buildValues);
+end.addEventListener("blur", buildValues);
+end.addEventListener("keydown", keypress);
+
+
+container.appendChild(start);
+container.appendChild(end);
+
+return container;
+}
+
+
+
+
+var table = new Tabulator("#example-table", {
+    movableRows:true,
+    layout:"fitColumns",
+    placeholder:"No Data Set",
+    pagination:"local",
+    paginationSize:100,
+    printAsHtml:true,
+    printHeader:"<h1 class='text-center'>الدخول والخروج للموظفين<h1>",
+    printFooter:"<h2 ><h2>",
+    paginationSizeSelector:[10, 50,100,200],
+    movableColumns:true,
+    paginationCounter:"rows",
+    rowFormatter:function(row){
+        var bk = row.getData();
+          row.getElement().style.backgroundColor = bk['color']; 
+          if(bk['color']=='yellow')
+          {
+            row.getElement().style.color='black';
+          }
+    },
+    columns:[
+        {title:"المسلسل", field:"index", sorter:"number",hozAlign:"center"},
+        {title:"رقم القيد", field:"num", sorter:"number",hozAlign:"center",headerFilter:"input"},
+        {title:"اسم الموظف", field:"name", sorter:"string",hozAlign:"center",headerFilter:"input"},
+        {title:"القسم", field:"dep", sorter:"string",hozAlign:"center", headerFilter:"list",headerFilterParams:{valuesLookup:true, clearable:true}},
+        {title:"وقت الدخول", field:"detected_at", sorter:"date",hozAlign:"center",headerFilter:"input"},
+        {title:"وقت الخروج", field:"outed_at", sorter:"date",hozAlign:"center",headerFilter:"input"},
+        {title:"ساعات العمل", field:"spend_time", formatter:"string", hozAlign:"center",headerFilter:"input"},
+        {title:"اذن الدخول", field:"reason_in", cellClick:function(e, cell){
+
+            
+    }, formatter:"string", hozAlign:"center",editor:"input", headerFilter:"list", headerFilterParams:{valuesLookup:true, clearable:true}},
+        {title:"اذن الخروج", field:"reason_out", formatter:"string", hozAlign:"center",headerFilter:"input",editor:"input", headerFilter:"list", headerFilterParams:{valuesLookup:true, clearable:true}},,
+    ],
+});
+
+document.getElementById("ajax-trigger").addEventListener("click", function(){
+    var dateRangeValue = $('#daterange').val();
+    if(dateRangeValue=='')
+    {
+        alert('اختر التاريخ')
+    }else{
+    table.setData("/reports/load_data/"+dateRangeValue+'/');
+    }
+   
+});
+
+
+document.getElementById("download-csv").addEventListener("click", function(){
+    table.download("csv", "data.csv");
+});
+
+//trigger download of data.json file
+// document.getElementById("download-json").addEventListener("click", function(){
+//     table.download("json", "data.json");
+// });
+
+//trigger download of data.xlsx file
+document.getElementById("download-xlsx").addEventListener("click", function(){
+    table.download("xlsx", "data.xlsx", {sheetName:"My Data"});
+});
+
+// document.getElementById("download-pdf").addEventListener("click", function(){
+//     table.download("pdf", "data.pdf", {
+//         orientation:"portrait",
+        
+//         title:"Example Report",
+//     });
+// });
+
+$("#printtable").click(function(){
+    table.print(true, true);
+});
+//trigger download of data.html file
+// document.getElementById("download-html").addEventListener("click", function(){
+//     table.download("html", "data.html", {style:true});
+// });
+})
+
+</script>
+<script>
+    function release() {
+      $.ajax({
+        url: "/cameras/release/",
+        type: "GET",
+        success: function (data) {
+  
+        },
+        error: function (xhr, status, error) {
+  
+          console.error(error);
+        }
+      });
+    }
+    
+  release()
+    
+  </script>
+{% endblock %}

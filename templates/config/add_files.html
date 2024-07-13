@@ -1,0 +1,104 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+<link rel="stylesheet" href="{% static 'dist/libs/flatpickr/flatpickr.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/prismjs/themes/prism-coy.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond/filepond.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/choices.js/public/assets/styles/choices.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond-plugin-image-edit/filepond-plugin-image-edit.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/dropzone/dropzone.css' %}">
+{% endblock %}
+{% block content %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb breadcrumb-example1 pt-2">
+    <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+    <li class="breadcrumb-item active" aria-current="page">تحميل ملفات ال db</li>
+  </ol>
+</nav>
+
+
+    <!-- Main content -->
+
+    <div class="card custom-card">
+      <div class="card-header justify-content-between">
+        <div class="card-title">
+            حميل ملفات ال db
+        </div>
+        <div class="prism-toggle">
+          <!-- <button class="btn btn-sm btn-primary-light">Show Code<i
+              class="ri-code-line ms-2 d-inline-block align-middle"></i></button> -->
+        </div>
+      </div>
+        <div class="card-body">
+            <form data-single="true" method="post"  action="{% url 'add_files' %}" class="dropzone">
+                {% csrf_token %}
+            </form>
+            <!-- <h3>terminal</h3> -->
+            <textarea id="resultt" dir="ltr" readonly  class="form-control mt-2" rows="5" style="resize: none;">
+                
+            </textarea>
+        </div>
+    </div>
+    {% endblock %}
+{% block scripts %}
+<script src="{% static 'dist/libs/filepond/filepond.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-image-edit/filepond-plugin-image-edit.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-image-crop/filepond-plugin-image-crop.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-image-resize/filepond-plugin-image-resize.min.js' %}"></script>
+<script src="{% static 'dist/libs/filepond-plugin-image-transform/filepond-plugin-image-transform.min.js' %}"></script>
+<script src="{% static 'dist/libs/dropzone/dropzone-min.js' %}"></script>
+<script src="{% static 'dist/js/fileupload.js' %}"></script>
+<script>
+   setInterval(()=>{
+    $.ajax({
+                url: '/config/result_files/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // console.log(data);
+                    data.strings.forEach(element => {
+                        console.log(element);
+                        var currentValue = $("#resultt").val();
+                        console.log(currentValue);
+                        currentValue=currentValue.trim()
+                        var updatedValue="";
+                        if(currentValue != ""){
+                         updatedValue =currentValue + "\nrun==> "+ element;
+                        }else{
+                        updatedValue ="run==> "+ element;
+                        }
+
+                        $("#resultt").val(updatedValue);
+                        // $('#resultt').text(element)
+                    });
+                }})
+   },500)
+</script>
+<script>
+  function release() {
+    $.ajax({
+      url: "/cameras/release/",
+      type: "GET",
+      success: function (data) {
+
+      },
+      error: function (xhr, status, error) {
+
+        console.error(error);
+      }
+    });
+  }
+  
+release()
+  
+</script>
+{% endblock %}
+        

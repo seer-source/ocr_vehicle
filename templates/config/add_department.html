@@ -1,0 +1,72 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-example1 pt-2">
+        <li class="breadcrumb-item"><a href="/"></a>الاقسام</li>
+        <li class="breadcrumb-item active" aria-current="page">اضافة قسم</li>
+    </ol>
+    
+</nav>
+
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            اضافة قسم
+        </div>
+        <div class="prism-toggle">
+           
+        </div>
+    </div>
+    <div class="card-body">
+        {% if form.errors %}
+        {% for field, error_list in form.errors.items %}
+        <div class="alert alert-outline-danger rounded-pill alert-dismissible fade show">
+          {{ field }}: {{ error_list.0 }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="bi bi-x"></i></button>
+    </div>
+            {% endfor %}
+    {% endif %}
+        <form method="post" class="row g-3">
+            {%csrf_token%}
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <label class="form-label"> السبب</label>
+                {{form.name}}
+            </div>
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <label class="form-label"> الموظف</label>
+                {{form.user_manager}}
+            </div>
+            <button class="btn btn-primary w-25" type="submit">حفظ</button>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+<script>
+    $('.select2').select2();
+</script>
+<script>
+    function release() {
+      $.ajax({
+        url: "/cameras/release/",
+        type: "GET",
+        success: function (data) {
+  
+        },
+        error: function (xhr, status, error) {
+  
+          console.error(error);
+        }
+      });
+    }
+    
+  release()
+    
+  </script>
+{% endblock %}

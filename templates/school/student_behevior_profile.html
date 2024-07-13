@@ -1,0 +1,33 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+<link rel="stylesheet" href="{% static 'dist/libs/tabulator/dist/css/tabulator_midnight.min.css' %}">
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb breadcrumb-example1 pt-2">
+    <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+    <li class="breadcrumb-item active" aria-current="page">student behevior profile</li>
+  </ol>
+</nav>
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+      <div class="card-title">
+        student behevior profile
+      </div>
+      <div class="prism-toggle">
+       
+      </div>
+    </div>
+    <div class="card-body">
+    <img width="100%" src='{% static "images/Evaluation_page-0001.jpg" %}'>
+    <img width="100%" src='{% static "images/Evaluation_page-0002.jpg" %}'>
+    <img width="100%" src='{% static "images/Evaluation_page-0003.jpg" %}'>
+    <img width="100%" src='{% static "images/Evaluation_page-0004.jpg" %}'>
+    <img width="100%" src='{% static "images/Evaluation_page-0005.jpg" %}'>
+    
+</div>
+</div>
+
+
+{% endblock %}

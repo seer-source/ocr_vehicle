@@ -1,0 +1,169 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block content %}
+    <!-- Content Header (Page header) -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-example1 pt-2">
+        <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+        <li class="breadcrumb-item active" aria-current="page">الكاميرات</li>
+      </ol>
+    </nav>
+
+    <div class="card custom-card">
+      <div class="card-header justify-content-between">
+        <div class="card-title">
+           الكاميرات
+        </div>
+        <div class="prism-toggle">
+          <!-- <button class="btn btn-sm btn-primary-light">Show Code<i
+              class="ri-code-line ms-2 d-inline-block align-middle"></i></button> -->
+        </div>
+      </div>
+        <div class="card-body p-0">
+          <table class="table table-striped projects">
+              <thead>
+                  <tr>
+                      <th style="width: 1%">
+                          #
+                      </th>
+                      <th style="width: 15%">
+                          Camera Name
+                      </th>
+                      <th style="width: 25%">
+                          Connection String
+                      </th>
+                      <th>
+                          camera type
+                      </th>
+                      <th style="width: 8%" class="text-center">
+                          Status
+                      </th>
+                      <th style="width: 30%">
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+              {% for camera in cameras %}
+                  <tr>
+                      <td>
+                          {{ camera.id}}
+                      </td>
+                      <td>
+                          <a>
+                              {{camera.name}}
+                          </a>
+                          <br/>
+                          <small>
+                             {{camera.created_at}}
+                          </small>
+                      </td>
+                      <td>
+                          {{camera.connection_string}}
+                      </td>
+                      <td class="project_progress">
+                         {{camera.camera_type}}
+                      </td>
+                      <td class="project-state">
+                            {% if camera.status == 'enable' %}
+      <span class="badge badge-success">{{ camera.status }}</span>
+
+    {% else %}
+        <span class="badge badge-danger">{{ camera.status }}</span>
+    {% endif %}
+
+                      </td>
+                      <td class="project-actions text-right">
+                          <!-- <a class="btn btn-primary btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#modal-default{{ camera.id}}">
+                              <i class="fas fa-folder">
+                              </i>
+                              View
+                          </a> -->
+                          <div class="modal fade" id="modal-default{{ camera.id}}">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title"> {{camera.name}}</h4>
+              <button type="button" class="close" data-bs-dismiss="modal" aria-bs-label="Close">
+                <span aria-bs-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>{{camera.description}}</p>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+
+                          <a class="btn btn-info btn-sm" href="{%  url 'edit_camera' camera.id %}">
+                              <i class="fas fa-pencil-alt">
+                              </i>
+                              Edit
+                          </a>
+                          <a class="btn btn-danger btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#modal-delete{{camera.id}}">
+                              <i class="fas fa-trash">
+                              </i>
+                              Delete
+                          </a>
+
+                           <div class="modal fade" id="modal-delete{{camera.id}}">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Delete Camera</h4>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"
+              aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="text-center">are you sure to delete {{ camera.name }} camera ?</p>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+              <a href="{% url 'delete_camera' camera.id %}" type="button" class="btn btn-primary">delete </a>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+                            </div>
+                      </td>
+                  </tr>
+                 {% endfor %}
+              </tbody>
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+
+    </div>
+    <!-- /.content -->
+  <!-- /.content-wrapper -->
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function release() {
+    $.ajax({
+      url: "/cameras/release/",
+      type: "GET",
+      success: function (data) {
+
+      },
+      error: function (xhr, status, error) {
+
+        console.error(error);
+      }
+    });
+  }
+  
+release()
+  
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% load custom_filters %}
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card custom-card">
+            <div class="card-header">
+                <div class="card-title">
+                    التصاريح اليوم
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="scroll-vertical" class="table table-bordered text-nowrap w-100">
+                    <thead>
+                        <tr>
+                        <th>السبب</th>
+                            <th>الموظفين</th>
+                            <th>وقت الطلب</th>
+                            <th>وفت التنفيذ</th>
+                            <th>قدم بواسطة </th>
+                        
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for per in permissions %}
+                        <tr class="{% if per.is_accept == True %}text-success{% elif per.is_accept == False %}text-danger{% endif %}">
+                            <td>{{per.reason.name}}</td>
+                            <td>
+                                <ul>
+                                    {% for emp in per.for_emp.all %}
+                                    <li class="list-inline-item">
+                                        <img alt="Avatar" class="avatar avatar-rounded" src="http://127.0.0.1:8000/media/{{emp.image}}">
+                                        {{emp.name}}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>{{per.created_at}}</td>
+                            <td>
+                                
+                                {% if per.time_exc_permission %}
+                                {{ per.time_exc_permission|get_formatted_duration }}
+                                {% endif %}
+                              </td>
+                              
+                            <td>{{per.created_by.username}}</td>
+                          
+                            
+                        </tr>
+                        {% endfor %}
+             
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

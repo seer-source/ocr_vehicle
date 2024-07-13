@@ -1,0 +1,11 @@
+<div class="dropdown">
+    <a href="javascript:void(0);" class="p-2 fs-12 text-muted" data-bs-toggle="dropdown" aria-expanded="false">
+        الكاميرات<i class="ri-arrow-down-s-line align-middle ms-1 d-inline-block"></i>
+    </a>
+    <ul class="dropdown-menu" role="menu">
+      {% for camera in cameras %}
+        <li><a class="dropdown-item"   data-bs-toggle="modal" onclick="openCamera(`{{camera.id}}`)"
+          data-bs-target="#camera_capture{{camera.id}}">{{camera.name}}</a></li>
+    {% endfor %}
+    </ul>
+</div>

@@ -1,0 +1,59 @@
+{% extends 'base_page.html' %}
+{% block content %}
+{% include 'widgets/title_widget.html' with title='المستخدمين' sub_title='السماحيات' %}
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            سماحية
+        </div>
+        <div class="prism-toggle">
+            <a href="{% url 'create_permission' %}" class="btn btn-sm btn-primary-light">اضافة سماحية</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="datatable-basic" class="table table-bordered text-nowrap w-100">
+            <thead>
+                <tr>
+                    <th>المسلسل</th>
+                    <th>الاسم</th>
+                    <th>الحقل</th>
+                    <th>action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for per in permissions %}
+                <tr>
+                    <td>{{per.id}}</td>
+                    <td>{{per.name}}</td>
+                    <td>{{per.content_type.app_label}}</td>
+                    <td style="width:30%">
+                        <a class='"btn btn-info btn-sm' href="{% url 'update_permission' per.id %}"> تعديل</a>
+                        <a class='"btn btn-danger btn-sm' href="#" data-bs-toggle="modal"
+                        data-bs-target="#modal-delete{{per.id}}"> حذف</a>
+                        
+                    </td>
+                    {% with per.id|stringformat:"s" as id %}
+                        {% with "modal-delete"|add:id as id_model_delete %}
+                            {% url 'delete_per' per.id as delete_url %}
+                            {% include 'models/model_with_action.html' with id=id_model_delete title="مسح المجموعة" message="هل انت متأكد من مسح "|add:per.name action=delete_url action_name="مسح" %}
+                        {% endwith %}
+                    {% endwith %} 
+                   
+                </tr>
+                {% endfor  %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    $('#datatable-basic').DataTable({
+        language: {
+            searchPlaceholder: 'البحث عن سماحية',
+            sSearch: '',
+        },
+        "pageLength": 10,
+    });
+</script>
+{% endblock %}

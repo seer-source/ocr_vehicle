@@ -1,0 +1,138 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block content %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb breadcrumb-example1 pt-2">
+    <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ add_or_update }} camera</li>
+  </ol>
+</nav>
+
+
+    <!-- Main content -->
+
+    <div class="card custom-card">
+      <div class="card-header justify-content-between">
+        <div class="card-title">
+          {{ add_or_update }} camera
+        </div>
+        <div class="prism-toggle">
+          <!-- <button class="btn btn-sm btn-primary-light">Show Code<i
+              class="ri-code-line ms-2 d-inline-block align-middle"></i></button> -->
+        </div>
+      </div>
+        <div class="card-body p-0">
+              <form id="quickForm" method="POST">
+                  {% csrf_token %}
+               <div class="row ">
+                 <div class="col-12 col-md-6">
+                    <div class="card-body">
+                  <div class="form-group">
+                   {{ form.name.label_tag }}
+                      {{ form.name }}
+                  </div>
+                  <div class="form-group mt-2">
+                      {{form.camera_type.label_tag }}
+                      {{ form.camera_type }}
+                  </div>
+
+                </div>
+                 </div>
+                  <div class="col-12 col-md-6">
+                    <div class="card-body">
+                  <div class="form-group">
+                      {{ form.connection_string.label_tag }}
+                      {{form.connection_string}}
+                  </div>
+                  <div class="form-group mt-2">
+                   {{form.status.label_tag}}
+                        {{form.status}}
+                                    </div>
+
+                </div>
+                 </div>
+               </div>
+                  <div  class="form-group px-4">
+                      {{form.description.label_tag}}
+                      {{form.description}}
+                  </div>
+                <!-- /.card-body -->
+                <div class="card-footer text-center">
+                  <button type="submit" class="btn btn-primary w-50">{{ add_or_update }}</button>
+                </div>
+              </form>
+            </div>
+        </div>
+  
+ 
+{% endblock %}
+{% block scripts %}
+
+<script src="{% static 'AdminLTE/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+
+<script src="{% static 'AdminLTE/plugins/jquery-validation/additional-methods.min.js' %}"></script>
+
+<script src="{% static 'AdminLTE/dist/js/adminlte.min.js' %}"></script>
+
+<script>
+$(function () {
+
+  $('#quickForm').validate({
+    rules: {
+      email: {
+        required: true,
+        email: true,
+      },
+      password: {
+        required: true,
+        minlength: 5
+      },
+      terms: {
+        required: true
+      },
+    },
+    messages: {
+      email: {
+        required: "Please enter a email address",
+        email: "Please enter a valid email address"
+      },
+      password: {
+        required: "Please provide a password",
+        minlength: "Your password must be at least 5 characters long"
+      },
+      terms: "Please accept our terms"
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element, errorClass, validClass) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      $(element).removeClass('is-invalid');
+    }
+  });
+});
+</script>
+<script>
+  function release() {
+    $.ajax({
+      url: "/cameras/release/",
+      type: "GET",
+      success: function (data) {
+
+      },
+      error: function (xhr, status, error) {
+
+        console.error(error);
+      }
+    });
+  }
+  
+release()
+  
+</script>
+{% endblock %}

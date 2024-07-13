@@ -1,0 +1,35 @@
+{% extends 'authentications/create_user.html' %}
+{% block content %}
+{% block title %}
+{% include 'widgets/title_widget.html' with title='المجموعات' sub_title='اضافة مجموعة' %}
+{% endblock %}
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            {% block title_cart %}
+            اضافة مجموعة
+            {% endblock %}
+        </div>
+        <div class="prism-toggle">
+        </div>
+    </div>
+    <div class="card-body">
+        {% include 'widgets/errors.html' %}
+        <form class='row g-3' method='post'>
+            {% csrf_token %}
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <label class="form-label">الاسم</label>
+                {{form.name}}
+            </div>
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <label class="form-label">السماحيات</label>
+                {{form.permissions}}
+            </div>
+            <button class='btn btn-primary w-25' type='submit'>
+                حفظ
+            </button>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

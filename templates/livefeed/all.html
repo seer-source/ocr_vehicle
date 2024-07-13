@@ -1,0 +1,136 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block styles %}
+{% endblock %}
+{% block content %}
+
+{% endblock %}
+{% block scripts %}
+
+<script>
+
+
+     $(function () {
+      $('.select2').select2();
+      $('.select2').on('select2:select', function(e) {
+      // 'e.params.data' contains the selected option data
+      var selectedOption = e.params.data;
+      addCamera(selectedOption.id,selectedOption.text);
+
+    });
+
+     $('.select2').on('select2:unselect', function(e) {
+    var unselectedOption = e.params.data;
+    closeCamera(unselectedOption.id,unselectedOption.text);
+  });
+
+
+    });
+ function addCamera(id,name) {
+
+  $('#bodyCameras').append('<div id="camera'+id+'" class="col-md-6 col-12"> \
+    <div class="card card-success"> \
+    <div id="overlay'+id+'" class="overlay dark"><i class="fas fa-3x fa-sync-alt"></i></div>\
+      <div class="card-header"> \
+        <h3 class="card-title">'+name+'</h3> \
+        <div class="card-tools"> \
+          <button type="button" class="btn btn-tool" data-card-widget="maximize"> \
+            <i class="fas fa-expand"></i> \
+          </button> \
+          <button type="button" class="btn btn-tool" data-card-widget="collapse"> \
+            <i class="fas fa-minus"></i> \
+          </button> \
+          <button type="button" onclick="closeCamera(' + id + ',\'' + name + '\')" class="btn btn-tool" data-card-widget="remove"> \
+            <i class="fas fa-times"></i> \
+          </button> \
+        </div> \
+      </div> \
+      <div class="card-body" style="height: 600px;"> \
+        <img id="video'+id+'" src="/livefeed/video/' + id + '" width="100%" height="60%"/> \
+          <div style="overflow-y:hidden">\
+                  <div class="filter-container'+id+' row p-0 m-0 scroll-container"  id="result'+id+'">\
+                 </div>\
+               </div>\
+      </div> \
+    </div> \
+  </div>');
+
+ setTimeout(() => {
+  $("#overlay" + id).hide();
+
+}, 13000);
+    }
+    function closeCamera(id,name){
+    var liElementWithTitleAhmed = $('li[title=\'' + name + '\']');
+  var spanChild = liElementWithTitleAhmed.find('span.select2-selection__choice__remove');
+  spanChild.click();
+    $.ajax({
+    url: "/cameras/release_camera/"+id,
+    type: "GET",
+    success: function(data) {
+
+    },
+    error: function(xhr, status, error) {
+
+      console.error(error);
+    }
+  });
+  setTimeout(()=>{
+  $('#video' + id).attr("src","");
+  $('#camera' + id).remove();
+  },1000);
+    }
+   setInterval(()=>{
+    $.ajax({
+                url: '/result_cameras/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                   data.data.forEach(function (obj) {
+                    console.log(obj);
+                    var newDiv = `
+                    <div class="col-11 p-0 m-0 mt-2">
+            <!-- small box -->
+            <div class="row p-0 m-0  bg-${obj.category}">
+              <div class="col-8 pt-2" >
+                <h3>${obj.name}</h3>
+                <p>${obj.id}</p>
+                <p>${obj.sort}</p>
+              </div>
+              <div class="col-4">
+                <i class="">
+                <a href="http://localhost:8000${obj.img}?text=${obj.name}" data-toggle="lightbox" data-title="${obj.des}">
+                <img src="http://localhost:8000${obj.img}?text=${obj.name}" width="95%" height="100%" class="img-fluid m-2" alt="${obj.name}"/>
+                </a>
+              </i>
+              </div>
+            </div>
+          </div>
+    `;
+  if (!$("#result"+obj.id_camera+" #p"+obj.id_person).length > 0) {
+      $("#result"+obj.id_camera).append(newDiv);
+    // $('.filter-container'+obj.id_camera).filterizr({gutterPixels: 0});
+    // $('.btns-'+obj.id_camera+'[data-filter]').on('click', function() {
+    //   $('.btns-'+obj.id_camera+'[data-filter]').removeClass('active');
+    //   $(this).addClass('active');
+    // });
+    }
+            });
+                },
+                error: function (error) {
+
+                    console.log('Error:', error);
+                }
+            });
+   },500);
+
+   $(function () {
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+      event.preventDefault();
+      $(this).ekkoLightbox({
+        alwaysShowClose: true
+      });
+    });
+  })
+</script>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+{% block mystyles %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
+ <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-example1 pt-2">
+        <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{title_all}}</li>
+    </ol>
+</nav>
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            {{title_all}}
+        </div>
+        <div class="prism-toggle">
+           {% if branches %}
+           <div class="dropdown">
+            <a href="javascript:void(0);" class="p-2 fs-12 text-muted" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                الافرع<i class="ri-arrow-down-s-line align-middle ms-1 d-inline-block"></i>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+                {% for branch in  branches %}
+                <li><a class="dropdown-item" href="javascript:void(0);">{{branch.name}}</a></li>
+                {% endfor %} 
+            </ul>
+        </div>
+           {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="file-export" class="table table-bordered text-nowrap w-100">
+                <thead>
+                    <tr>
+                        {% if emp %}
+                        <th>رقم القيد</th>
+                        {% endif %}
+                        <th>الصورة</th>
+                        <th>الاسم</th>
+                        {% if emp %}
+                        <th>القسم</th>
+                        {% endif %}
+                        <th>id</th>
+                        <th>time in</th>
+                        <th>time out</th>
+                        <th>time spend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   {% for p in all_visitor %}
+                   <tr>
+                    {% if emp %}
+                    <td>
+                       {{ p.person_id.registration_number}}
+                    </td>
+                    {% endif %}
+                    <td>
+                        <span class="avatar avatar-xxl avatar-rounded  me-3">
+                            <img src="http://127.0.0.1:8000/media/{{p.person_id.image}}" alt="">
+                        </span>
+                    </td>
+                    <td>
+                        {{p.person_id.name}}
+                    </td>
+                    {% if emp %}
+                        <td>
+                            {{p.person_id.department.name}}
+                        </td>
+                    {% endif %}
+                    <td>
+                        {{p.person_id.id_national}}
+                    </td>
+                    <td>
+                        {{p.detected_at}}
+                    </td>
+                    <td>
+                        {{p.outed_at}}
+                    </td>
+                    <td>
+                        {{p.spend_time}}
+                    </td>
+                   </tr>
+                   {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<!-- Datatables Cdn -->
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- Internal Datatables JS -->
+<script src="{% static 'dist/js/datatables.js' %}"></script>
+<script>
+    function release() {
+      $.ajax({
+        url: "/cameras/release/",
+        type: "GET",
+        success: function (data) {
+  
+        },
+        error: function (xhr, status, error) {
+  
+          console.error(error);
+        }
+      });
+    }
+    
+  release()
+    
+  </script>
+{% endblock %}

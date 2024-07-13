@@ -1,0 +1,15 @@
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            {{title}}
+        </div>
+        <div class="prism-toggle">
+            {% if contain_btn %}
+            <a href="{% url 'add_departments' %}" class="btn btn-sm btn-primary-light">{{btn_title}}</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+       {{content_card}}
+    </div>
+</div>

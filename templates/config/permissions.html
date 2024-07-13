@@ -1,0 +1,161 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+<style>
+ 
+</style>
+{% endblock %}
+{% block content %}
+{% for camera in cameras %}
+            {% url 'capture_image_for_search' as capture_url %}
+            {% include 'models/camera_capture_model.html' with id=camera.id name=camera.name action=capture_url %}
+{% endfor %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb breadcrumb-example1 pt-2">
+        <li class="breadcrumb-item"><a href="/">التصاريح</a></li>
+        <li class="breadcrumb-item active" aria-current="page">جميع التصاريح</li>
+    </ol>
+</nav>
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            التصاريح
+        </div>
+        <div class="prism-toggle">
+            <form id="formDateRanger" method="get" action="{% url 'permissions' %}">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="btn-list">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-info dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                البحث بالكاميرا
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% for camera in cameras %}
+                                    <li><a class="dropdown-item"  href="#" data-bs-toggle="modal" onclick="openCamera(`{{camera.id}}`)"
+                                        data-bs-target="#camera_capture{{camera.id}}" >{{camera.name}}</a></li>   
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                        <div class="input-group-text text-muted"> <i class="ri-calendar-line"></i> </div>
+                        <input type="text" class="form-control" id="daterange" name="date_range" placeholder="Date range picker">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="datatable-basic" class="table table-bordered text-nowrap w-100">
+                <thead>
+                    <th>#</th>
+                    <th>التصريح</th>
+                    <th>الموظفين</th>
+                    <th>اضيف بواسطة</th>
+                    {% block thTitle %}
+                    <th>action</th>
+                    {% endblock thTitle %}
+                    
+                </thead>
+                <tbody>
+                    {% for perm in permissions %}
+                    <tr class="{% if perm.is_accept == True %}text-success{% elif perm.is_accept == False %}text-danger{% endif %}">
+                        <td>{{perm.id}}</td>
+                        <td>{{perm.reason.name}}</td>
+                        <td>
+                            <ul>
+                                {% for emp in perm.for_emp.all %}
+                                <li class="list-inline-item">
+                                    <img alt="Avatar" class="avatar avatar-rounded" src="http://127.0.0.1:8000/media/{{emp.image}}">
+                                    {{emp.name}}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{perm.created_by.username}}</td>
+                       {% block tbody %}
+                       <td>
+                        <a class="btn btn-info btn-sm" href="{% url 'edit_permissions' perm.id %}">
+                            <i class="fas fa-pencil-alt">
+                            </i>
+                            تعديل
+                        </a>
+                        <a class="btn btn-danger btn-sm" href="#" data-bs-toggle="modal"
+                            data-bs-target="#modal-delete{{perm.id}}">
+                            حذف
+                        </a>
+                        {% if perm.is_accept or perm.is_accept is null %}
+                        <a class="btn btn-success  btn-sm" href="#" data-bs-toggle="modal"
+                            data-bs-target="#modal-refuse{{perm.id}}">
+                             غير موافق 
+                        </a>
+                        {% endif %}
+                        {% if  perm.is_accept == False or perm.is_accept is null %}
+                        <a class="btn btn-success  btn-sm" href="#" data-bs-toggle="modal"
+                            data-bs-target="#modal-accept{{perm.id}}">
+                              موافق
+                        </a>
+                        {% endif %}
+                        {% with perm.id|stringformat:"s" as id %}
+                            {% with "modal-delete"|add:id as id_model_delete %}
+                                {% include 'models/model_with_action.html' with id=id_model_delete title="مسح التصريح" message="هل انت متأكد من مسح "|add:perm.reason.name action=delete_url action_name="مسح" %}
+                            {% endwith %}
+                            {% with "modal-accept"|add:id as id_model_accept %}
+                                {% url 'accept_permission' id as accept_url %}
+                                    {% include 'models/model_with_action.html' with id=id_model_accept title="الموافقة علي التصريح" message="هل انت متأكد من الموافقة علي  "|add:perm.reason.name action=accept_url action_name="موافق" %}
+                            {% endwith %}
+                            {% with "modal-refuse"|add:id as id_model_refuse %}
+                                {% url 'refuse_permission' id as refuse_url %}
+                                {% include 'models/model_with_action.html' with id=id_model_refuse title="عدم الموافقة علي التصريح" message="هل انت متأكد من عدم الموافقة علي  "|add:perm.reason.name action=refuse_url action_name="عدم الموافقة" %}
+                            {% endwith %}
+                        {% endwith %}
+                       
+                    </td>
+                       {% endblock tbody %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'dist/libs/flatpickr/flatpickr.min.js' %}"></script>
+<script>
+    var dateRange='';
+   
+    $(function(){
+    flatpickr("#daterange", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+    });
+
+    $('#daterange').change((event) => {
+        const value = event.target.value;
+        var check=check_can_submit(value);
+        if(check){
+            $('#formDateRanger').submit()
+        }
+    });
+
+    function check_can_submit(value){
+        if(dateRange!='' && value.includes('-')){
+            dateRange='';
+            return true;
+            }else if(dateRange==value){
+                dateRange='';
+                return true;
+            }else{
+                dateRange=value;
+            }
+            return false;
+    }
+    
+    });
+
+    release()
+</script>
+{% endblock %}

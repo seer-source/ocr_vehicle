@@ -1,0 +1,66 @@
+
+<div class="container">
+    <ul class="timeline list-unstyled">
+
+        {% for p in detections %}
+        <li>
+            <div class="timeline-time text-end">
+               <span class="date">
+                {% if p.detected_at %}
+                                    {{p.detected_at|date:"l"|upper}}
+                                    {% else %}
+                                    {{p.outed_at|date:"l"|upper}}
+                                    {% endif %}
+<<<<<<< HEAD
+               </span>pp
+=======
+               </span>
+>>>>>>> 8121218aed684e2783e5cee530e916c7c78831b1
+               <span class="time d-inline-block">
+                {% if p.detected_at %}
+                {{p.detected_at|time}}
+                {% else %}
+                {{p.outed_at|time}}
+                {% endif %}
+               </span>
+            </div>
+            <div class="timeline-icon">
+               <a href="javascript:void(0);"></a>
+            </div>
+            <div class="timeline-body">
+                <div class="d-flex align-items-top timeline-main-content flex-wrap mt-0">
+                    <div class="avatar avatar-md  me-3 avatar-rounded mt-sm-0 mt-4">
+                        <img alt="avatar" src="{{person.image.url}}">
+                    </div>
+                    <div class="flex-fill">
+                        <div class="d-flex align-items-center">
+                            <div class="mt-sm-0 mt-2">
+                                <p class="mb-0 fs-14 fw-semibold">
+                                    {{p.camera_id}}
+                                </p>
+                                <p class="mb-0 text-muted">detected at  {% if p.detected_at %}
+                                    {{p.detected_at}}
+                                    {% else %}
+                                    {{p.outed_at}}
+                                    {% endif %} </p>
+                            </div>
+                            <div class="ms-auto">
+
+                                <span class="float-end badge bg-light text-muted timeline-badge">
+                                    {% if p.detected_at %}
+                                    {{p.detected_at|date}}
+                                    {% else %}
+                                    {{p.outed_at|date}}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </li>
+        {% endfor %}
+       
+           </ul>
+
+ </div>

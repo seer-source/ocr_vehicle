@@ -1,0 +1,678 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+<link rel="stylesheet" href="{% static 'dist/libs/flatpickr/flatpickr.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/prismjs/themes/prism-coy.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond/filepond.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/choices.js/public/assets/styles/choices.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/filepond-plugin-image-edit/filepond-plugin-image-edit.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/libs/dropzone/dropzone.css' %}">
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb breadcrumb-example1 pt-2">
+    <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+    <li class="breadcrumb-item active" aria-current="page">اضافة شخص</li>
+  </ol>
+</nav>
+
+<div class="card custom-card">
+  <div class="card-header justify-content-between">
+    <div class="card-title">
+      اضافة شخص
+    </div>
+    <div class="prism-toggle">
+    
+    </div>
+  </div>
+  <div class="card-body">
+    <form  style="display: none;" data-single="true" method="post" action="https://httpbin.org/post" class="dropzone"></form>
+        
+    {% if form.errors %}
+    {% for field, error_list in form.errors.items %}
+    <div class="alert alert-outline-danger rounded-pill alert-dismissible fade show">
+      {{ field }}: {{ error_list.0 }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"><i class="bi bi-x"></i></button>
+</div>
+        {% endfor %}
+{% endif %}
+    <form class="row g-3 needs-validation" method="post"  enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-12 col-md-4">
+          <div class="form-group">
+            <div class="card custom-card">
+              <div class="card-header justify-content-between">
+                  <div class="card-title">
+                       {{form.front_national_img.label_tag}}
+                  </div>
+                  <div class="dropdown">
+                    <a href="javascript:void(0);" class="p-2 fs-12 text-muted" data-bs-toggle="dropdown" aria-expanded="false">
+                        الكاميرات<i class="ri-arrow-down-s-line align-middle ms-1 d-inline-block"></i>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                      {% for camera in cameras %}
+                        <li><a class="dropdown-item"   data-bs-toggle="modal" onclick="openCamera(2,'{{camera.id}}')"
+                          data-bs-target="#modal-info_2">{{camera.name}}</a></li>
+                       
+                        {% endfor %}
+                     
+                    </ul>
+                    <div class="modal fade" id="modal-info_2" data-bs-backdrop="static"
+                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                    aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h4 class="modal-title">Capture Image</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <img id="video-2" width="100%" height="300" />
+                          </div>
+                          <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+                          <button type="button"  data-bs-dismiss="modal" id="captureImage-2" class="btn btn-primary">capture</button>
+                         
+                          </div>
+                        </div>
+                        
+                      </div>
+                      </div>
+                </div>
+              </div>
+              <div class="card-body">
+                {{form.front_national_img}}
+              </div>
+          </div>
+          <button type="button" id="uploadButton" class="btn btn-primary btn-wave" data-bs-toggle="button"
+            >سحب البيانات</button>
+          <button  id="hide1" class="btn btn-primary btn-loader">
+            <span class="me-2">Loading</span>
+            <span class="loading"><i class="ri-loader-2-fill fs-16"></i></span></button>
+          </div>
+         
+          
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="form-group">
+            <div class="card custom-card">
+              <div class="card-header justify-content-between">
+                  <div class="card-title">
+                    {{form.back_national_img.label_tag}}
+                  </div>
+                  <div class="dropdown">
+                    <a href="javascript:void(0);" class="p-2 fs-12 text-muted" data-bs-toggle="dropdown" aria-expanded="false">
+                        الكاميرات<i class="ri-arrow-down-s-line align-middle ms-1 d-inline-block"></i>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                      {% for camera in cameras %}
+                        <li><a class="dropdown-item"   data-bs-toggle="modal" onclick="openCamera(1,'{{camera.id}}')"
+                          data-bs-target="#modal-info">{{camera.name}}</a></li>
+                       
+                        {% endfor %}
+                     
+                    </ul>
+                    <div class="modal fade" id="modal-info" data-bs-backdrop="static"
+                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                    aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h4 class="modal-title">Capture Image</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <img id="video-1" width="100%" height="300" />
+                          </div>
+                          <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+                          <button type="button"  data-bs-dismiss="modal" id="captureImage" class="btn btn-primary">capture</button>
+                           
+                            
+                          </div>
+                        </div>
+                        
+                      </div>
+                      </div>
+                </div>
+              </div>
+              <div class="card-body">
+                {{form.back_national_img}}
+              </div>
+          </div>
+          <button type="button" id="uploadButton2" class="btn btn-primary btn-wave" data-bs-toggle="button"
+            >سحب البيانات</button>
+          <button  id="hide2" class="btn btn-primary btn-loader">
+            <span class="me-2">Loading</span>
+            <span class="loading"><i class="ri-loader-2-fill fs-16"></i></span></button>
+          </div>
+        
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="form-group">
+            <div class="card custom-card">
+              <div class="card-header justify-content-between">
+                  <div class="card-title">
+                    {{form.image.label_tag}}
+                  </div>
+                  <div class="dropdown">
+                    <a href="javascript:void(0);" class="p-2 fs-12 text-muted" data-bs-toggle="dropdown" aria-expanded="false">
+                        الكاميرات<i class="ri-arrow-down-s-line align-middle ms-1 d-inline-block"></i>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                      {% for camera in cameras %}
+                        <li><a class="dropdown-item"   data-bs-toggle="modal" onclick="openCamera(3,'{{camera.id}}')"
+                          data-bs-target="#modal-info_3">{{camera.name}}</a></li>
+                       
+                        {% endfor %}
+                     
+                    </ul>
+                    <div class="modal fade" id="modal-info_3" data-bs-backdrop="static"
+                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                    aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h4 class="modal-title">Capture Image</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <img id="video-3" width="100%" height="300" />
+                          </div>
+                          <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+                          <button type="button"  data-bs-dismiss="modal" id="captureImage-3" class="btn btn-primary">capture</button>
+                         
+                          </div>
+                        </div>
+                        
+                      </div>
+                      </div>
+                </div>
+              </div>
+              <div class="card-body">
+                {{form.image}}
+              </div>
+          </div>
+        
+          </div>
+        </div>
+        </div>
+        <div class="card custom-card">
+          <div class="card-header justify-content-between">
+              <div class="card-title">
+                  اضافة اكثر من صورة
+              </div>
+              <div class="dropdown">
+                  <a href="javascript:void(0);" class="p-2 fs-12 text-muted" data-bs-toggle="dropdown" aria-expanded="false">
+                      الكاميرات<i class="ri-arrow-down-s-line align-middle ms-1 d-inline-block"></i>
+                  </a>
+                  <ul class="dropdown-menu" role="menu">
+                    {% for camera in cameras %}
+                      <li><a class="dropdown-item"   data-bs-toggle="modal" onclick="openCamera(4,'{{camera.id}}')"
+                        data-bs-target="#modal-info_4">{{camera.name}}</a></li>
+                     
+                      {% endfor %}
+                   
+                  </ul>
+                  <div class="modal fade" id="modal-info_4" data-bs-backdrop="static"
+                  data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                  aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Capture Image</h4>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <img id="video-4" width="100%" height="300" />
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                          <button type="button" class="btn btn-secondary"
+                                                              data-bs-dismiss="modal">Close</button>
+                        <button type="button"  data-bs-dismiss="modal" id="captureImage-4" class="btn btn-primary">capture</button>
+                       
+                        </div>
+                      </div>
+                      
+                    </div>
+                    </div>
+              </div>
+          </div>
+          <div class="card-body">
+        <input type="file" id="multiImages" class="multiple-filepond" name="images" multiple  data-max-file-size="3MB" data-max-files="6"> 
+        </div>
+        </div>
+       
+        <!-- {{form.images}} -->
+          <div class="row mt-3 g-3">
+        <div class="form-group col-12 col-md-6">
+          <!-- {{ form.name.label_tag }} -->
+          <label for="">الاسم</label>
+          {{ form.name }}
+        </div>
+        <div class="form-group col-12 col-md-6">
+          <!-- {{ form.id_national.label_tag }} -->
+          <label for="">الرقم القومي</label>
+          {{ form.id_national }}
+        </div>
+        <div class="form-group col-12 col-md-6">
+          {{ form.job_title.label_tag }}
+          {{ form.job_title }}
+        </div>
+        <div class="col-12 col-md-6 row align-items-center mt-4 ps-4 pt-2">
+          {% for radio in form.gender %}
+          <div class="form-check form-check-md col-6">
+            <input id="input{{radio.choice_label}}" type="radio" class="form-check-input" name="{{ form.gender.name }}" value="{{ radio.choice_label }}" {% if radio.choice_label == 'ذكر' %}checked{% endif %}>
+            <label for="input{{radio.choice_label}}" class="form-check-label">{{radio.choice_label}}</label>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="form-group col-12 col-md-6">
+      <label> : التاريخ</label>
+      <div class="input-group date" id="reservationdate" data-target-input="nearest">
+        {{form.date_of_birth}}
+        <div class="input-group-text text-muted"> <i class="ri-calendar-line"></i> </div>
+      </div>
+    </div>
+    <div class="form-group col-12 col-md-6">
+      <!-- {{ form.address.label_tag }} -->
+      <label>العنوان</label>
+      {{ form.address }}
+    </div>
+    <div class="form-group col-12 col-md-6">
+      <!-- {{form.status.label_tag}} -->
+      <label for="">الحالة</label>
+      {{form.status}}
+    </div>
+    <div class="form-group col-12 col-md-6 id_department_p">
+      <label for="">القسم</label>
+      {{form.department}}
+    
+    </div>
+    <div class="form-group col-12 col-md-6 id_department_p">
+      <label for="">رقم القيد</label>
+      {{form.registration_number}}
+    
+    </div>
+    <div class="form-group col-12 col-md-6 id_department_p">
+      <label for="">رقم الواتساب</label>
+      {{form.mobile_whatsapp}}
+    
+    </div>
+    <div class="col-12 col-md-6 row align-items-center mt-4 ps-4 pt-2">
+      
+      {% for radio in form.type_register %}
+      <div class="form-check form-check-md col-6 mx-auto">
+        <input onchange="showOrhid('{{radio.choice_label}}')" id="input{{radio.choice_label}}" type="radio" class="form-check-input" name="{{ form.type_register.name }}" value="{{ radio.choice_label }}" {% if radio.choice_label == form.type_register.value %}checked{% endif %}>
+        <label for="input{{radio.choice_label}}" class="form-check-label">{{radio.choice_label}}</label>
+    </div>
+    {% endfor %}
+</div>
+      </div>
+      <div id="employee">
+
+      </div>
+     
+      </div>
+        <button type="submit" class="btn btn-primary w-25 m-3">{{update_or_add}}</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'dist/js/validation.js' %}"></script>
+<script src="{% static 'dist/libs/flatpickr/flatpickr.min.js' %}"></script>
+<script src="{% static 'dist/js/date&time_pickers.js' %}"></script>
+<script src="{% static 'dist/libs/prismjs/prism.js' %}"></script>
+<script src="{% static 'dist/js/prism-custom.js' %}"></script>
+
+    <script src="{% static 'dist/libs/filepond/filepond.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-edit/filepond-plugin-image-edit.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-file-validate-type/filepond-plugin-file-validate-type.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-crop/filepond-plugin-image-crop.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-resize/filepond-plugin-image-resize.min.js' %}"></script>
+    <script src="{% static 'dist/libs/filepond-plugin-image-transform/filepond-plugin-image-transform.min.js' %}"></script>
+    <script src="{% static 'dist/libs/dropzone/dropzone-min.js' %}"></script>
+    <!-- <script src="{% static 'dist/js/fileupload.js' %}"></script> -->
+
+<script>
+  $('#hide1').hide()
+  $('#hide2').hide()
+  FilePond.registerPlugin(
+        FilePondPluginImagePreview,
+        FilePondPluginImageExifOrientation,
+       
+        FilePondPluginFileEncode,
+        FilePondPluginImageEdit,
+        FilePondPluginFileValidateType,
+        FilePondPluginImageCrop,
+        FilePondPluginImageResize,
+        FilePondPluginImageTransform
+    );
+ var pods;
+ var single1;
+ var single2;
+ var single3;
+  $(function(){
+    
+    const MultipleElement = document.querySelector('.multiple-filepond');
+   pods= FilePond.create(MultipleElement,);
+
+  single1= FilePond.create(
+        document.querySelector('.single-fileupload1'),
+        
+    );
+  single2= FilePond.create(
+        document.querySelector('.single-fileupload2'),
+        
+    );
+  single3= FilePond.create(
+        document.querySelector('.single-fileupload3'),    
+    );
+  
+   
+  
+
+
+  })
+  function openCamera(index, id) {
+    $("#video-" + index).attr("src", "/cameras/video/" + id);
+  }
+
+  $('#captureImage').click(function () {
+    $.ajax({
+      url: '/cameras/capture_image/',
+      type: 'GET',
+      xhrFields: {
+        responseType: 'blob' 
+      },
+      success: function (response) {
+        const fileInput = document.getElementById('id_image');
+        var filename = 'captured_image.jpg';
+        var file = new File([response], filename, { type: 'image/jpeg' });
+        single2.addFile(file)
+        $("#video-1").attr("src", "");
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  });
+  $(function(){
+
+    $('#captureImage-4').click(function () {
+    $.ajax({
+      url: '/cameras/capture_image/',
+      type: 'GET',
+      xhrFields: {
+        responseType: 'blob'
+      },
+      success: function (response) {
+        var filename = 'captured_image.jpg';
+        var file = new File([response], filename, { type: 'image/jpeg' });
+        pods.addFile(file)
+        dataTransfer = new DataTransfer()
+        dataTransfer.items.add(file);
+      
+        var fileInput = document.getElementsByClassName('filepond--browser');
+          fileInput[0].files = dataTransfer.files;
+        $("#video-4").attr("src", "");
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  });
+  })
+
+  $('#captureImage-2').click(function () {
+
+    $.ajax({
+      url: '/cameras/capture_image/',
+      type: 'GET',
+      xhrFields: {
+        responseType: 'blob'
+      },
+      success: function (response) {
+
+        const fileInput = document.getElementById('id_front_national_img');
+        var filename = 'captured_image.jpg';
+
+        var file = new File([response], filename, { type: 'image/jpeg' });
+        single1.addFile(file)
+        $("#video-2").attr("src", "");
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  });
+
+  $('#captureImage-3').click(function () {
+    $.ajax({
+      url: '/cameras/capture_image/',
+      type: 'GET',
+      xhrFields: {
+        responseType: 'blob'
+      },
+      success: function (response) {
+        const fileInput = document.getElementById('id_back_national_img');
+        var filename = 'captured_image.jpg';
+        var file = new File([response], filename, { type: 'image/jpeg' });
+       single3.addFile(file)
+        $("#video-3").attr("src", "");
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  });
+
+
+
+
+  $("#uploadButton").click(function () {
+    $('#uploadButton').hide()
+    $('#hide1').show();
+    var formData = new FormData();
+    formData.append("image", single1.getFile().file);
+    var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+    formData.append("csrfmiddlewaretoken", csrfToken);
+    $.ajax({
+      url: "/persons/get_details_from_national_img/",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: async function (response) {
+        $('#hide1').hide()
+        $('#uploadButton').show()
+        data = JSON.parse(response['response']);
+
+        const originalDate = data.Birthday;
+
+        // Split the date into day, month, and year
+        const dateComponents = originalDate.split('-');
+        const day = dateComponents[0];
+        const month = dateComponents[1];
+        const year = dateComponents[2];
+
+        // Create the new date in "mm/dd/yyyy" format
+        const newDateFormat = `${month}/${day}/${year}`;
+        $('#id_name').val(`${data.firstname} ${data.secondname}`)
+        $('#id_id_national').val(data.iden.replace(/\s/g, ''));
+        $('#date').val(newDateFormat)
+        $('#id_address').val(`${data.address_1} - ${data.address_2}`)
+        const fileInput = document.getElementById('id_image');
+        var filename = 'captured_image.jpg';
+        const blob = new Blob([Uint8Array.from(atob(response['image']), c => c.charCodeAt(0))], { type: 'image/jpeg' });
+        var file = new File([blob], filename, { type: 'image/jpeg' });
+      single3.addFile(file)
+
+      },
+      error: function () {
+        $('#hide1').hide()
+        $('#uploadButton').show()
+        $('#page-loader').removeClass('show')
+        alert("Error connecting to the server.");
+      }
+    });
+  });
+  $("#uploadButton2").click(function () {
+    
+    $('#uploadButton2').hide()
+    $('#hide2').show()
+
+    var formData = new FormData();
+    formData.append("image",single2.getFile().file);
+    var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+    formData.append("csrfmiddlewaretoken", csrfToken);
+    $.ajax({
+      url: "/persons/get_details_from_back_national_img/",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: async function (response) {
+        $('#hide2').hide()
+        $('#uploadButton2').show()
+  
+        data = JSON.parse(response['response']);
+        console.log(data);
+        $('#id_job_title').val(`${data.job} ${data.job_location}`)
+        if (data.Gender == 'ذكر') {
+        
+          $('#inputMale').prop('checked', true);
+         
+          $('#inputFemal').prop('checked', false);
+        } else {
+          $('#inputFemal').prop('checked', true);
+          
+          $('#inputMale').prop('checked', false);
+        }
+        $('#page-loader').removeClass('show')
+      },
+      error: function () {
+        $('#hide2').hide()
+        $('#uploadButton2').show()
+        alert("Error connecting to the server.");
+        $('#page-loader').removeClass('show')
+      }
+    });
+  });
+
+  function addFileToDropify(index, file) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      $('.dropify-preview').eq(index).css('display', 'block');
+      var imageElement = $('<img>');
+      imageElement.attr('src', e.target.result);
+     $('.dropify-clear').eq(index).css('display', 'block');
+      $('.dropify-render').eq(index).append(imageElement);
+    };
+    reader.readAsDataURL(file);
+
+  }
+
+
+  function showOrhid(value) {
+    console.log(value);
+    if (value == 'موظف') {
+      $('.id_department_p').show();
+      
+      $('#info-employee').remove()
+    } else {
+      $('.id_department_p').hide()
+      $('#employee').append(`
+      <div id="info-employee" class="col-12 pt-4">
+      <h3>معلومات الزائر</h3>
+        <div class="row g-3">
+          <div class="form-group col-12 col-md-6">
+            {{info_form.department.label_tag}}
+            {{info_form.department}}
+          </div>
+          <div class="form-group col-12 col-md-6">
+            {{info_form.type.label_tag}}
+            {{info_form.type}}
+          </div>
+          <div class="form-group col-12 col-md-6">
+            {{info_form.reason.label_tag}}
+            {{info_form.reason}}
+          </div>
+          <div class="form-group col-12 col-md-6">
+            {{info_form.other.label_tag}}
+            {{info_form.other}}
+          </div>
+          <div class="form-group col-12 col-md-6">
+            {{info_form.visior_type.label_tag}}
+            {{info_form.visior_type}}
+          </div>
+          <div class="form-group col-12 col-md-6">
+            {{info_form.empolyee.label_tag}}
+            {{info_form.empolyee}}
+          </div>
+        </div>
+        </div>`)
+    }
+  }
+  showOrhid(`{{form.type_register.value}}`)
+</script>
+<script>
+  function release() {
+    $.ajax({
+      url: "/cameras/release/",
+      type: "GET",
+      success: function (data) {
+
+      },
+      error: function (xhr, status, error) {
+
+        console.error(error);
+      }
+    });
+  }
+  
+release()
+  
+$(function(){
+  {% if person %}
+  {% if person.image %}
+    if('{{ person }}'){
+      single3.addFile('{{ person.image.url }}');
+    }
+    {% endif %}
+  {% endif %}
+  
+  {% for image in person.images.all %}
+    pods.addFile('{{ image.image.url }}');
+  {% endfor %}
+  
+  {% if person.back_national_img %}
+    single2.addFile('{{ person.back_national_img.url }}');
+  {% endif %}
+  
+  {% if person.front_national_img %}
+    single1.addFile('{{ person.front_national_img.url }}');
+  {% endif %}
+
+  
+})
+</script>
+{% endblock %}

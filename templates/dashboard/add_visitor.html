@@ -1,0 +1,303 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/dropify.min.css' %}">
+{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>ADD VISITOR</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">DASHBOARD</a></li>
+            <li class="breadcrumb-item active">ADD VISITOR</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- left column -->
+        <div class="col-md-12">
+          <!-- jquery validation -->
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">ADD VISITOR <small>Upload National ID</small></h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="quickForm" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {% if form.errors %}
+              <div class="alert alert-danger">
+                <strong>Error(s) in the form:</strong>
+                <ul>
+                  {% for field in form %}
+                  {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                  {% endfor %}
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endif %}
+              <div class="row d-flex justify-content-center align-items-center">
+                <div class="card-body col-12 col-md-4">
+                  <div class="form-group">
+                    {{form.frontImage.label_tag}}
+                    {{form.frontImage}}
+                  </div>
+                  <div class="btn-group w-100">
+                    <button type="button" class="btn btn-info"> use cameras </button>
+
+                    <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                      <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu" role="menu">
+                      {% for camera in cameras %}
+                      <a class="dropdown-item" href="#" data-toggle="modal" onclick="openCamera(1,'{{camera.id}}')"
+                        data-target="#modal-info">{{camera.name}}</a>
+                      {% endfor %}
+                    </div>
+                    <div class="modal fade" id="modal-info">
+                      <div class="modal-dialog">
+                        <div class="modal-content bg-info">
+                          <div class="modal-header">
+                            <h4 class="modal-title">Capture Image</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                              onclick="release()">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <img id="video-1" width="100%" height="300" />
+                          </div>
+                          <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-light" data-dismiss="modal"
+                              onclick="release()">Close</button>
+                            <button type="button" class="btn btn-outline-light" id="captureImage"
+                              data-dismiss="modal">Capture</button>
+                          </div>
+                        </div>
+                        <!-- /.modal-content -->
+                      </div>
+                      <!-- /.modal-dialog -->
+                    </div>
+                  </div>
+
+                </div>
+                <div class="card-body col-12 col-md-4">
+                  <div class="form-group">
+                    {{form.backImage.label_tag}}
+                    {{form.backImage}}
+                  </div>
+                  <div class="btn-group w-100">
+                    <button type="button" class="btn btn-info">use cameras</button>
+
+                    <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                      <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu" role="menu">
+                      {% for camera in cameras %}
+                      <a class="dropdown-item" href="#" data-toggle="modal" onclick="openCamera(2,'{{camera.id}}')"
+                        data-target="#modal-info_2">{{camera.name}}</a>
+                      {% endfor %}
+                    </div>
+                    <div class="modal fade" id="modal-info_2">
+                      <div class="modal-dialog">
+                        <div class="modal-content bg-info">
+                          <div class="modal-header">
+                            <h4 class="modal-title">Capture Image</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                              onclick="release()">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <img id="video-2" width="100%" height="300" />
+                          </div>
+                          <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-light" data-dismiss="modal"
+                              onclick="release()">Close</button>
+                            <button type="button" class="btn btn-outline-light" id="captureImage-2"
+                              data-dismiss="modal">Capture</button>
+                          </div>
+                        </div>
+                        <!-- /.modal-content -->
+                      </div>
+                      <!-- /.modal-dialog -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer text-center row mx-auto">
+                <div class="col-1"></div>
+                <button type="reset" class="btn btn-secondary w-50 col-12 col-md-4">Clear</button>
+                <div class="col-2"></div>
+                <button type="submit" class="btn btn-primary w-50 col-12 col-md-4">Continue</button>
+                <div class="col-1"></div>
+              </div>
+            </form>
+          </div>
+          <!-- /.card -->
+        </div>
+        <!--/.col (left) -->
+        <!-- right column -->
+        <div class="col-md-6">
+
+        </div>
+        <!--/.col (right) -->
+      </div>
+      <!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/dropify.min.js' %}"></script>
+<script src="{% static 'AdminLTE/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script>
+  $(function () {
+
+    $('#quickForm').validate({
+      rules: {
+        image: {
+          required: true
+        },
+      },
+      messages: {
+
+      },
+      errorElement: 'span',
+      errorPlacement: function (error, element) {
+        error.addClass('invalid-feedback');
+        element.closest('.form-group').append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass('is-invalid');
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass('is-invalid');
+      }
+    });
+  });
+
+  $(".dropify-front").dropify(
+    {
+      messages: {
+        'default': 'قم برفع صوره وجه البطاقة هنا ',
+        'replace': 'اضغط للاستبدال الصوره',
+        'remove': 'مسح',
+        'error': 'صوره خاطئه,برجاء إعاده الرفع'
+      }
+    }
+  );
+  $(".dropify-back").dropify(
+    {
+      messages: {
+        'default': 'قم برفع صوره خلفية البطاقة هنا ',
+        'replace': 'اضغط للاستبدال الصوره',
+        'remove': 'مسح',
+        'error': 'صوره خاطئه,برجاء إعاده الرفع'
+      }
+    }
+  );
+  function openCamera(index, id) {
+    $("#video-" + index).attr("src", "/cameras/video/" + id);
+  }
+
+  function release() {
+    $.ajax({
+      url: "/cameras/release/",
+      type: "GET",
+      success: function (data) {
+
+      },
+      error: function (xhr, status, error) {
+
+        console.error(error);
+      }
+    });
+  }
+
+  $('#captureImage').click(function () {
+
+    $.ajax({
+      url: '/cameras/capture_image/',
+      type: 'GET',
+      xhrFields: {
+        responseType: 'blob' // Set the response type to 'blob'
+      },
+      success: function (response) {
+        $('.dropify-clear').eq(0).click();
+        const fileInput = document.getElementById('id_frontImage');
+        var filename = 'captured_image.jpg';
+        // Create a new file object from the blob response
+        var file = new File([response], filename, { type: 'image/jpeg' });
+        // Add the file to the DataTransfer object
+        dataTransfer = new DataTransfer()
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        addFileToDropify(0, file);
+        $("#video-1").attr("src", "");
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+    release();
+  });
+
+  $('#captureImage-2').click(function () {
+
+    $.ajax({
+      url: '/cameras/capture_image/',
+      type: 'GET',
+      xhrFields: {
+        responseType: 'blob'
+      },
+      success: function (response) {
+        $('.dropify-clear').eq(1).click();
+        const fileInput = document.getElementById('id_backImage');
+        var filename = 'captured_image.jpg';
+
+        var file = new File([response], filename, { type: 'image/jpeg' });
+        // Add the file to the DataTransfer object
+        dataTransfer = new DataTransfer()
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        addFileToDropify(1, file)
+        $("#video-2").attr("src", "");
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+    release();
+  });
+  function addFileToDropify(index, file) {
+    console.log(index)
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      $('.dropify-preview').eq(index).css('display', 'block');
+      var imageElement = $('<img>');
+      imageElement.attr('src', e.target.result);
+      // Change the display style of the element with class dropify-clear to block
+      $('.dropify-clear').eq(index).css('display', 'block');
+      // Append the image element to the target element
+      $('.dropify-render').eq(index).append(imageElement);
+    };
+
+    // Convert the File object to a data URL
+    reader.readAsDataURL(file);
+  }
+
+</script>
+{% endblock %}

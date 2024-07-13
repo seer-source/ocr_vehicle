@@ -1,0 +1,30 @@
+<div class="col-xl-12">
+    <div class="card custom-card">
+        <div class="card-header  justify-content-between">
+            <div class="card-title">
+                {{title}}
+            </div>
+        
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled crm-top-deals mb-0">
+                {% for vis in most_empolyee %}
+                <li>
+                    <div class="d-flex align-items-top flex-wrap">
+                        <div class="me-2">
+                            <span class="avatar avatar-sm avatar-rounded">
+                                <img src="http://localhost:8000/media/{{vis.person_id__image}}" alt="">
+                            </span>
+                        </div>
+                        <div class="flex-fill">
+                            <p class="fw-semibold mb-0">{{vis.person_id__name}}</p>
+                            <span class="text-muted fs-12">{{vis.person_id__job_title}}</span>
+                        </div>
+                        <div class="fw-semibold fs-15">{{vis.visits}}</div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block mystyles %}
+{% endblock %}
+{% block content %}
+{% include 'widgets/title_widget.html' with title='المستخدمين' sub_title='اضافة مستخدم' %}
+<div class="card custom-card">
+    <div class="card-header justify-content-between">
+        <div class="card-title">
+            اضافة مستخدم
+        </div>
+        <div class="prism-toggle">
+        </div>
+    </div>
+    <div class="card-body">
+        {% include 'widgets/errors.html' %}
+        <form class='row g-3' method='post'>
+            {% csrf_token %}
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">ربط بموظف</label>
+                {{form.person_id}}
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">الاسم الاول</label>
+                {{form.first_name}}
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label"> الاسم الثاني</label>
+                {{form.last_name}}
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">الفرع</label>
+                {{form.branch}}
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">البريد الالكتروني</label>
+                {{form.username}}
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">كلمة المرور</label>
+                {{form.password}}
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <label class="form-label">المجموعات</label>
+                {{form.groups}}
+            </div>
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="form-check form-switch">
+                   {{form.is_active}}
+                    <label class="form-check-label" for="flexSwitchCheckDefault">نشط</label>
+                </div>
+            </div>
+            <button class='btn btn-primary w-25' type='submit'>
+                حفظ
+            </button>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static  'dist/js/choices.js' %}"></script>
+<script src="{% static  'dist/js/custom.js' %}"></script>
+<script>
+    function setNames(event){
+        var selectedOption = event.target.options[event.target.selectedIndex];
+        var selectedText = selectedOption.text;
+        $('#first_name').val(selectedText.split(' ')[0]);
+        $('#last_name').val(selectedText.split(' ')[1]);
+    }
+</script>
+{% endblock %}

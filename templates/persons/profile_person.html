@@ -1,0 +1,219 @@
+{% extends 'base_page.html' %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static  'AdminLTE/plugins/daterangepicker/daterangepicker.css' %}">
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb breadcrumb-example1 pt-2">
+    <li class="breadcrumb-item"><a href="/">الرئسية</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{person.name}}</li>
+  </ol>
+</nav>
+<div class="col-4 col-md-12">
+  <div class="card custom-card overflow-hidden">
+      <div class="card-body p-0">
+          <div class="d-sm-flex align-items-top p-4 border-bottom-0 main-profile-cover">
+              <div>
+                  <span class="avatar avatar-xxl avatar-rounded  me-3">
+                      <img src="{{person.image.url}}" alt="">
+                  </span>
+              </div>
+              <div class="flex-fill main-profile-info">
+                  <div class="d-flex align-items-center justify-content-between">
+                      <h6 class="fw-semibold mb-1 text-fixed-white">{{person.name}}</h6>
+                      <button class="btn btn-light btn-wave">Edit</button>
+                  </div>
+                  <p class="mb-1 text-muted text-fixed-white op-7">{{person.job_title}}</p>
+                  <p class="fs-12 text-fixed-white mb-4 op-5">  
+                   
+                      <span><i class="ri-map-pin-line me-1 align-middle"></i>{{person.address}}</span> 
+                  </p>
+                
+              </div>
+          </div>
+          
+      </div>
+  </div>
+</div>
+<div class="col-8 col-md-12">
+  <div class="row">
+      <div class="col-xl-12">
+          <div class="card custom-card">
+              <div class="card-body p-0">
+                  <div class="p-3 border-bottom border-block-end-dashed d-flex align-items-center justify-content-between">
+                      <div>
+                          <ul class="nav nav-tabs mb-0 tab-style-6 justify-content-start" id="myTab" role="tablist">
+                              <li class="nav-item" role="presentation">
+                                  <button class="nav-link active" id="activity-tab" data-bs-toggle="tab"
+                                      data-bs-target="#activity-tab-pane" type="button" role="tab"
+                                      aria-controls="activity-tab-pane" aria-selected="true"><i
+                                          class="ri-gift-line me-1 align-middle d-inline-block"></i>details</button>
+                              </li>
+                              <li class="nav-item" role="presentation">
+                                  <button class="nav-link" id="posts-tab" data-bs-toggle="tab"
+                                      data-bs-target="#posts-tab-pane" type="button" role="tab"
+                                      aria-controls="posts-tab-pane" aria-selected="false"><i
+                                          class="ri-bill-line me-1 align-middle d-inline-block"></i>Reports</button>
+                              </li>
+                              <li class="nav-item" role="presentation">
+                                  <button class="nav-link" id="tracking-tab" data-bs-toggle="tab"
+                                      data-bs-target="#tracking-tab-pane" type="button" role="tab"
+                                      aria-controls="tracking-tab-pane" aria-selected="false"><i
+                                          class="ri-bill-line me-1 align-middle d-inline-block"></i>tracking</button>
+                              </li>
+                              
+                          </ul>
+                      </div>   
+                     
+                  </div>
+                  <div class="p-3">
+                      <div class="tab-content" id="myTabContent">
+                          <div class="tab-pane show active fade p-0 border-0" id="activity-tab-pane"
+                              role="tabpanel" aria-labelledby="activity-tab" tabindex="0">
+                              <div class="card">
+                                <div class="card-header">
+                                  <h3 class="card-title">Details user</h3>
+                    
+                                  <div class="card-tools">
+                    
+                                  </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body table-responsive p-0" style="height: 500px;">
+                                  <table class="table table-head-fixed text-nowrap">
+                                    <thead>
+                                      <tr>
+                                        <th>title</th>
+                                        <th>details</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                      <td>created at</td>
+                                      <td>{{person.created_at}}</td>
+                                    </tr>
+                                    <tr>
+                                      <td>name</td>
+                                      <td>{{person.name}}</td>
+                                    </tr>
+                                    <tr>
+                                      <td>national id</td>
+                                      <td>{{person.id_national}}</td>
+                                    </tr>
+                                    <tr>
+                                      <td>birth date</td>
+                                      <td>{{person.date_of_birth}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>gender</td>
+                                        <td>{{person.gender}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>address</td>
+                                        <td>{{person.address}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>image national id</td>
+                                        <td>
+                                            <img src="http://localhost:8000/media/{{person.front_national_img}}" height="130px">
+                                            <img src="http://localhost:8000/media/{{person.back_national_img}}" height="130px">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>extenal images</td>
+                                        <td>
+                                        {% for image in person.images.all %}
+                                            <img src="http://localhost:8000/{{image.image.url}}" height="130px">
+                                        {% endfor %}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <!-- /.card-body -->
+                              </div>
+                          </div>
+                          <div class="tab-pane fade p-0 border-0" id="posts-tab-pane"
+                              role="tabpanel" aria-labelledby="posts-tab" tabindex="0">
+                              <div class="card">
+                                <div class="card-header">
+                                  <h3 class="card-title">Users Reports</h3>
+                    
+                                  <div class="card-tools">
+                                   
+                                  </div>
+                                </div>
+                                <div class="card-body table-responsive p-0" style="height: 500px;">
+                                  <table class="table table-head-fixed text-nowrap">
+                                    <thead>
+                                      <tr>
+                                        <th>ID</th>
+                                        <th>Date</th>
+                                        <th>Camera</th>
+                                        <th>time</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for p in detections %}
+                                    <tr>
+                                      <td>{{p.id}}</td>
+                                      <td>{{p.detected_at}}</td>
+                                      <td>{{p.camera_id.name}}</td>
+                                      <td>{{p.spend_time}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                  </table>
+                                </div>
+                            
+                              </div>
+                          </div>
+                          <div class="tab-pane fade p-0 border-0 " id="tracking-tab-pane"
+                          role="tabpanel" aria-labelledby="tracking-tab" tabindex="0">
+                          <div class="card">
+                            <div class="card-header">
+                              <h3 class="card-title">tracking</h3>
+                
+                              <div class="card-tools">
+                              </div>
+                            </div>
+                            <div class="card-body table-responsive p-0" style="height: 500px;">
+                            {% include './tracking_view.html' %}
+                            </div>
+                        </div>
+                        </div>
+                      </div>    
+                  </div>
+              </div>
+          </div>
+      </div>
+  
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static  'AdminLTE/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<script>
+   $('#reservation').daterangepicker()
+</script>
+<script>
+    function release() {
+      $.ajax({
+        url: "/cameras/release/",
+        type: "GET",
+        success: function (data) {
+  
+        },
+        error: function (xhr, status, error) {
+  
+          console.error(error);
+        }
+      });
+    }
+    
+  release()
+    
+  </script>
+{% endblock %}
