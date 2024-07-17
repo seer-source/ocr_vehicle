@@ -11,14 +11,15 @@ from app_resources.utils import cameras
 import cv2
 import numpy as np
 import os
+import torch
 from PIL import Image
 from vehicle.vehicle_tracker import ObjectTracker,VideoProcessor
 from app_resources.utils import detect_vehicle,ids_vehicel
-
+device=torch.device('cuda')  if torch.cuda.is_available() else torch.device('cpu') 
 # from vehicle.utils import load_models,map_to_classes_names,sort_boxes_right_to_left,predict_image
 #license_detection,char_detection_model=load_models('vehicle/models/license_detection.pt','vehicle/models/chars_detection.pt')
-object_tracker=ObjectTracker(os.path.join('vehicle','models','tracker.pt'),[])
-video_processor=VideoProcessor(object_tracker,[],print)
+object_tracker=ObjectTracker(os.path.join('vehicle','models','tracker.pt'),[]).to(device)
+video_processor=VideoProcessor(object_tracker,detect_vehicle)
 camera_list = []
 cameras_object = []
 def open_camera(request, id):
@@ -71,7 +72,7 @@ def generate(camera_id):
         ret, frame = cap.read()
         if not ret:
             continue
-        video_processor.process_frame(frame)
+        frame=video_processor.process_frame(camera_id,frame)
         # detect_vehicle(camera_id,frame,frame,'testtst')
         _, jpeg = cv2.imencode('.jpg', frame)
         

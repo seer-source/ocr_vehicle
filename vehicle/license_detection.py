@@ -2,9 +2,10 @@ import torch
 import os
 from ultralytics import YOLO
 
-names = {0: '0', 1: '١', 2: '٢', 3: '٣', 4: '٤', 5: '٥', 6: '٦', 7: '٧', 8: '٨', 9: '٩', 10: 'ع', 11: 'أ', 12: 'ب', 13: 'س', 14: 'د', 15: 'ف',
-         16: 'ج', 17: 'ه', 18: 'ك', 19: 'ل', 20: 'م', 21: 'ن', 22: 'ر', 23: 'ص', 24: 'س', 25: 'ت', 26: 'و', 27: 'ي', 28: 'ز'}
+names = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: 'ع', 11: 'أ', 12: 'ب', 13: 'س', 14: 'د', 15: 'ف',
+         16: 'ج', 17: 'ه', 18: 'ق', 19: 'ل', 20: 'م', 21: 'ن', 22: 'ر', 23: 'ص', 24: 'س', 25: 'ت', 26: 'و', 27: 'ي', 28: 'ز'}
 
+device=torch.device('cuda')  if torch.cuda.is_available() else torch.device('cpu') 
 
 def sort_boxes_right_to_left(class_indices, bboxes, confidences):
     class_indices = class_indices.unsqueeze(1)
@@ -47,8 +48,8 @@ def bbox_iou(box1, box2):
     return inter_area / union_area
 
 
-license_detection = YOLO('vehicle','models', 'license_detection.pt')
-char_detection_model = YOLO('vehicle','models', 'alpha_detection.pt')
+license_detection = YOLO(os.path.join('vehicle','models', 'license_detection.pt')).to(device)
+char_detection_model = YOLO(os.path.join('vehicle','models', 'alpha_detection.pt')).to(device)
 
 
 def map_to_classes_names(sorted_pair):
@@ -70,12 +71,23 @@ def predict_image(frame):
     return list_of_images, conf
 
 
-def process_image_and_get_results(image):
+def process_image_and_get_results(main_frame,image):
     list_plates, confidence = predict_image(image)
+    if len(list_plates)==2 or len(confidence)==2:
+        temp_plate=None
+        best_confidence=0
+        for con,plate in zip(confidence,list_plates):
+            if con>best_confidence:
+                best_confidence=con
+                temp_plate=plate
+        confidence=best_confidence
+        list_plates=[temp_plate]
+        print('found two license')
     dict_of_results = {'license_confidence': confidence}
     for plate_image in list_plates:
         results = char_detection_model.predict(
             plate_image, save=True)[0].cpu()
+        
         char_confidences = results.boxes.conf
         class_indices = results.boxes.cls
         bboxes = results.boxes.xyxy.cpu()
@@ -88,4 +100,11 @@ def process_image_and_get_results(image):
         result = map_to_classes_names(sorted_pairs_boxes[0])
         dict_of_results['chars_confidence'] = sorted_pairs_boxes[2].tolist()
         dict_of_results['chars_result'] = result
+        dict_of_results['license_plate']=plate_image
+        dict_of_results['frame']=main_frame
     return dict_of_results
+
+
+
+
+

@@ -5,7 +5,7 @@ import logging
 from PIL import Image, ImageDraw, ImageFont
 import io
 import time
-from vehicle.license_detection import process_image_and_get_results
+from license_detection import process_image_and_get_results
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 def process_single_license_result(result):
@@ -58,6 +58,19 @@ def convert_detections_to_dict(detections_list):
         detections_dict['data'].append(detection.data)
 
     return detections_dict
+def get_highest_confidence_license_plate(data):
+    highest_confidence = -1
+    best_license_plate = None
+    frame=None
+    
+    for entry in data:
+        confidence = entry['license_confidence'].item()  # Convert tensor to float
+        if confidence > highest_confidence:
+            highest_confidence = confidence
+            best_license_plate = entry['license_plate']
+            frame=entry['frame']
+    
+    return best_license_plate,frame
 
 class TrackInfo:
     def __init__(self, track_id, initial_box, cls, confidence):
@@ -184,15 +197,19 @@ class ObjectTracker:
         y2 = min(frame.shape[0], int(y + h / 2))
         return frame[y1:y2, x1:x2]
 
-    def validate(self, image):
+    def validate(self,main_frame,camera_id, image,callback):
         if len(self.results_of_prediction)>=3:
             predictions=get_highest_confidence_chars(self.results_of_prediction)
-            license_prediction = ''.join([char for char, confidence in predictions])
-            print('license_prediction with the best accurate',license_prediction)
+            license_prediction = ' '.join([char for char, confidence in predictions])
+            # print('license_prediction with the best accurate',license_prediction)
+            best_license_plate,frame=get_highest_confidence_license_plate(self.results_of_prediction)
+            callback(camera_id,frame,best_license_plate,license_prediction)
             self.results_of_prediction=[]
             return True
         
-        dict_of_results  = process_image_and_get_results(image)
+        dict_of_results  = process_image_and_get_results(main_frame,image)
+        if len(dict_of_results['license_confidence'])==0:
+            return False
         self.results_of_prediction.append(dict_of_results)
         return False
 
@@ -204,7 +221,7 @@ class VideoProcessor:
         self.display_initialized = False
         self.callback=callback
 
-    def process_frame(self, frame):
+    def process_frame(self, camera_id,frame):
         clean_frame = frame.copy()  # Create a clean copy of the frame for cropping
         height, width = frame.shape[:2]
         results = self.object_tracker.track(frame)
@@ -240,18 +257,18 @@ class VideoProcessor:
             cv2.circle(frame, (int(x), int(rear_edge_y)), 5, (0, 0, 255), -1)  # Red for rear edge
 
             if track.status == "coming_on":
-                if front_edge_y > half_height:
+                if front_edge_y > half_height+(height/4):
                     if track.track_id not in self.object_tracker.validated:
                         cropped_object = self.object_tracker.crop_object(clean_frame, track.boxes[-1])
-                        if self.object_tracker.validate(cropped_object):
+                        if self.object_tracker.validate(clean_frame,camera_id,cropped_object,self.callback):
                             self.object_tracker.validated.add(track.track_id)
                             # cv2.imwrite(f"coming_on_cropped_{track.track_id}.jpg", cropped_object)
                             track_ids_to_remove.append(track.track_id)
             elif track.status == "going_off":
-                if front_edge_y < half_height:
+                if front_edge_y < half_height+(height/4):
                     if track.track_id not in self.object_tracker.validated:
                         cropped_object = self.object_tracker.crop_object(clean_frame, track.boxes[-1])
-                        if self.object_tracker.validate(cropped_object):
+                        if self.object_tracker.validate(clean_frame,camera_id,cropped_object,self.callback):
                             self.object_tracker.validated.add(track.track_id)
                             # cv2.imwrite(f"going_off_cropped_{track.track_id}.jpg", cropped_object)
                             track_ids_to_remove.append(track.track_id)
@@ -259,30 +276,34 @@ class VideoProcessor:
         for track_id in track_ids_to_remove:
             self.object_tracker.clear_track_id(track_id)
 
-        cv2.polylines(annotated_frame, [np.array(self.object_tracker.convert_to_absolute_points(self.polygon_points, width, height), dtype=np.int32)], isClosed=True, color=(0, 255, 0), thickness=2)
+        # cv2.polylines(annotated_frame, [np.array(self.object_tracker.convert_to_absolute_points(self.polygon_points, width, height), dtype=np.int32)], isClosed=True, color=(0, 255, 0), thickness=2)
         return cv2.resize(annotated_frame, (640, 640))
 
-    # def display_frame(self, frame):
-    #     cv2.imshow('frame', frame)
-    #     cv2.waitKey(1)
+tracker=ObjectTracker('vehicle/models/tracker.pt',[])
 
-    # def run(self):
-    #     while self.cap.isOpened():
-    #         success, frame = self.cap.read()
-    #         if not success:
-    #             break
+video_process=VideoProcessor(tracker,print)
 
-    #         processed_frame = self.process_frame(frame)
-    #         self.display_frame(processed_frame)
+import cv2 as cv
 
-    #     self.cap.release()
-    #     cv2.destroyAllWindows()
+cap=cv.VideoCapture('vehicle/Cars All.mp4')
+if not cap.isOpened():
+    print("Error: Could not open video file.")
+while cap.isOpened():
+    ret, frame = cap.read()
+    
+    if not ret:
+        print("Reached end of video or there is an issue with the video file.")
+        break
+    frame=video_process.process_frame('camera_id one ',frame)
+    cv.imshow('Video Frame', frame)
 
-# def main():
-#     polygon_points = [(0.4078125, 0.059375), (0.965625, 0.3234375), (0.9, 0.903125), (0.025, 0.2578125)]
-#     object_tracker = ObjectTracker("yolov8n.pt", polygon_points)
-#     video_processor = VideoProcessor("./all_cars_video.mp4", object_tracker, polygon_points)
-#     video_processor.run()
+    if cv.waitKey(25) & 0xFF == ord('q'):
+        break
 
-# if __name__ == "__main__":
-#     main()
+
+
+
+
+cap.release()
+# Close all OpenCV windows
+cv.destroyAllWindows()
