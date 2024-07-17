@@ -5,7 +5,7 @@ import logging
 from PIL import Image, ImageDraw, ImageFont
 import io
 import time
-from liences_detection import process_image_and_get_results
+from vehicle.license_detection import process_image_and_get_results
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 def process_single_license_result(result):
@@ -197,11 +197,12 @@ class ObjectTracker:
         return False
 
 class VideoProcessor:
-    def __init__(self, video_path, object_tracker, polygon_points):
-        self.cap = cv2.VideoCapture(video_path)
+    def __init__(self, object_tracker,callback):
+        # self.cap = cv2.VideoCapture(video_path)
         self.object_tracker = object_tracker
-        self.polygon_points = polygon_points
+        # self.polygon_points = polygon_points
         self.display_initialized = False
+        self.callback=callback
 
     def process_frame(self, frame):
         clean_frame = frame.copy()  # Create a clean copy of the frame for cropping
@@ -261,27 +262,27 @@ class VideoProcessor:
         cv2.polylines(annotated_frame, [np.array(self.object_tracker.convert_to_absolute_points(self.polygon_points, width, height), dtype=np.int32)], isClosed=True, color=(0, 255, 0), thickness=2)
         return cv2.resize(annotated_frame, (640, 640))
 
-    def display_frame(self, frame):
-        cv2.imshow('frame', frame)
-        cv2.waitKey(1)
+    # def display_frame(self, frame):
+    #     cv2.imshow('frame', frame)
+    #     cv2.waitKey(1)
 
-    def run(self):
-        while self.cap.isOpened():
-            success, frame = self.cap.read()
-            if not success:
-                break
+    # def run(self):
+    #     while self.cap.isOpened():
+    #         success, frame = self.cap.read()
+    #         if not success:
+    #             break
 
-            processed_frame = self.process_frame(frame)
-            self.display_frame(processed_frame)
+    #         processed_frame = self.process_frame(frame)
+    #         self.display_frame(processed_frame)
 
-        self.cap.release()
-        cv2.destroyAllWindows()
+    #     self.cap.release()
+    #     cv2.destroyAllWindows()
 
-def main():
-    polygon_points = [(0.4078125, 0.059375), (0.965625, 0.3234375), (0.9, 0.903125), (0.025, 0.2578125)]
-    object_tracker = ObjectTracker("yolov8n.pt", polygon_points)
-    video_processor = VideoProcessor("./all_cars_video.mp4", object_tracker, polygon_points)
-    video_processor.run()
+# def main():
+#     polygon_points = [(0.4078125, 0.059375), (0.965625, 0.3234375), (0.9, 0.903125), (0.025, 0.2578125)]
+#     object_tracker = ObjectTracker("yolov8n.pt", polygon_points)
+#     video_processor = VideoProcessor("./all_cars_video.mp4", object_tracker, polygon_points)
+#     video_processor.run()
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

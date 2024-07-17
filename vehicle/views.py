@@ -12,12 +12,13 @@ import cv2
 import numpy as np
 import os
 from PIL import Image
-from ultralytics import YOLO
+from vehicle.vehicle_tracker import ObjectTracker,VideoProcessor
 from app_resources.utils import detect_vehicle,ids_vehicel
 
-from vehicle.utils import load_models,map_to_classes_names,sort_boxes_right_to_left,predict_image
+# from vehicle.utils import load_models,map_to_classes_names,sort_boxes_right_to_left,predict_image
 #license_detection,char_detection_model=load_models('vehicle/models/license_detection.pt','vehicle/models/chars_detection.pt')
-
+object_tracker=ObjectTracker(os.path.join('vehicle','models','tracker.pt'),[])
+video_processor=VideoProcessor(object_tracker,[],print)
 camera_list = []
 cameras_object = []
 def open_camera(request, id):
@@ -70,8 +71,8 @@ def generate(camera_id):
         ret, frame = cap.read()
         if not ret:
             continue
-       
-        detect_vehicle(camera_id,frame,frame,'testtst')
+        video_processor.process_frame(frame)
+        # detect_vehicle(camera_id,frame,frame,'testtst')
         _, jpeg = cv2.imencode('.jpg', frame)
         
         #process_image_and_get_results(frame,license_detection,char_detection_model)

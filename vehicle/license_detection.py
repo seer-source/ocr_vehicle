@@ -47,8 +47,8 @@ def bbox_iou(box1, box2):
     return inter_area / union_area
 
 
-license_detection = YOLO(os.path.join('models', 'license_detection.pt'))
-char_detection_model = YOLO(os.path.join('models', 'alpha.pt'))
+license_detection = YOLO('vehicle','models', 'license_detection.pt')
+char_detection_model = YOLO('vehicle','models', 'alpha_detection.pt')
 
 
 def map_to_classes_names(sorted_pair):
@@ -68,6 +68,7 @@ def predict_image(frame):
         x1, y1, x2, y2 = [round(i) for i in box.tolist()]
         list_of_images.append(results.orig_img[y1:y2, x1:x2])
     return list_of_images, conf
+
 
 def process_image_and_get_results(image):
     list_plates, confidence = predict_image(image)
