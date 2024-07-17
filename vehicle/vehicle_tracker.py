@@ -7,6 +7,7 @@ import io
 import time
 from license_detection import process_image_and_get_results
 # Initialize logging
+from app_resources.utils import detect_vehicle
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 def process_single_license_result(result):
     # Extract license confidence
@@ -208,7 +209,8 @@ class ObjectTracker:
             return True
         
         dict_of_results  = process_image_and_get_results(main_frame,image)
-        if len(dict_of_results['license_confidence'])==0:
+        
+        if len(dict_of_results['license_confidence'].flatten().tolist())==0:
             return False
         self.results_of_prediction.append(dict_of_results)
         return False
@@ -281,29 +283,27 @@ class VideoProcessor:
 
 tracker=ObjectTracker('vehicle/models/tracker.pt',[])
 
-video_process=VideoProcessor(tracker,print)
+video_process=VideoProcessor(tracker,detect_vehicle)
 
-import cv2 as cv
+# import cv2 as cv
 
-cap=cv.VideoCapture('vehicle/Cars All.mp4')
-if not cap.isOpened():
-    print("Error: Could not open video file.")
-while cap.isOpened():
-    ret, frame = cap.read()
-    
-    if not ret:
-        print("Reached end of video or there is an issue with the video file.")
-        break
-    frame=video_process.process_frame('camera_id one ',frame)
-    cv.imshow('Video Frame', frame)
-
-    if cv.waitKey(25) & 0xFF == ord('q'):
-        break
+# cap=cv.VideoCapture('vehicle/all_cars_video.mp4')
+# if not cap.isOpened():
+#     print("Error: Could not open video file.")
+# while cap.isOpened():
+#     ret, frame = cap.read()
+#     if not ret:
+#         print("Reached end of video or there is an issue with the video file.")
+#         break
+#     frame=video_process.process_frame('camera_id one ',frame)
+#     cv.imshow('Video Frame', frame)
+#     if cv.waitKey(25) & 0xFF == ord('q'):
+#         break
 
 
 
 
 
-cap.release()
-# Close all OpenCV windows
-cv.destroyAllWindows()
+# cap.release()
+# # Close all OpenCV windows
+# cv.destroyAllWindows()
