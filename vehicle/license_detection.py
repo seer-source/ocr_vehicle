@@ -2,8 +2,8 @@ import torch
 import os
 from ultralytics import YOLO
 
-names = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: 'ع', 11: 'أ', 12: 'ب', 13: 'س', 14: 'د', 15: 'ف',
-         16: 'ج', 17: 'ه', 18: 'ق', 19: 'ل', 20: 'م', 21: 'ن', 22: 'ر', 23: 'ص', 24: 'س', 25: 'ت', 26: 'و', 27: 'ي', 28: 'ز'}
+# names = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: 'ع', 11: 'أ', 12: 'ب', 13: 'س', 14: 'د', 15: 'ف',
+        #  16: 'ج', 17: 'ه', 18: 'ق', 19: 'ل', 20: 'م', 21: 'ن', 22: 'ر', 23: 'ص', 24: 'س', 25: 'ت', 26: 'و', 27: 'ي', 28: 'ز'}
 
 device=torch.device('cuda')  if torch.cuda.is_available() else torch.device('cpu') 
 
@@ -52,7 +52,7 @@ license_detection = YOLO(os.path.join('vehicle','models', 'license_model.pt')).t
 char_detection_model = YOLO(os.path.join('vehicle','models', 'char_detection.pt')).to(device)
 
 
-def map_to_classes_names(sorted_pair):
+def map_to_classes_names(sorted_pair,names):
     text = []
     for id_cls in sorted_pair.tolist():
         if int(id_cls) in names:
@@ -87,6 +87,7 @@ def process_image_and_get_results(main_frame,image):
     for plate_image in list_plates:
         results = char_detection_model.predict(
             plate_image, save=True)[0].cpu()
+        names=results.names
         
         char_confidences = results.boxes.conf
         class_indices = results.boxes.cls
@@ -97,7 +98,7 @@ def process_image_and_get_results(main_frame,image):
         # Sort the results right to left
         sorted_pairs_boxes = sort_boxes_right_to_left(
             nms_class_indices, nms_boxes, nms_confidences)
-        result = map_to_classes_names(sorted_pairs_boxes[0])
+        result = map_to_classes_names(sorted_pairs_boxes[0],names)
         dict_of_results['chars_confidence'] = sorted_pairs_boxes[2].tolist()
         dict_of_results['chars_result'] = result
         dict_of_results['license_plate']=plate_image

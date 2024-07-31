@@ -5,9 +5,9 @@ import logging
 from PIL import Image, ImageDraw, ImageFont
 import io
 import time
-from license_detection import process_image_and_get_results
+from .license_detection import process_image_and_get_results
 # Initialize logging
-from app_resources.utils import detect_vehicle
+from app_resources.utils  import detect_vehicle
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 def process_single_license_result(result):
     # Extract license confidence
@@ -282,12 +282,20 @@ class VideoProcessor:
         return cv2.resize(annotated_frame, (640, 640))
 
 tracker=ObjectTracker('vehicle/models/object_tracker.pt',[])
+# import os
+# from uuid import uuid1
+# def save_tracks(camera_id,frame,license_img,chars):
+#     os.makedirs('stored',exist_ok=True)
+#     image_id=str(uuid1())
+#     cv.imwrite(f"stored/frame_{image_id}_.jpg",frame)
+#     cv.imwrite(f"stored/license_img_{chars}__{image_id}_.jpg",license_img)
+    
 
 video_process=VideoProcessor(tracker,detect_vehicle)
 
 # import cv2 as cv
 
-# cap=cv.VideoCapture('vehicle/all_cars_video.mp4')
+# cap=cv.VideoCapture('vehicle/Cars All.mp4')
 # if not cap.isOpened():
 #     print("Error: Could not open video file.")
 # while cap.isOpened():
