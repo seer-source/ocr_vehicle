@@ -48,8 +48,8 @@ def bbox_iou(box1, box2):
     return inter_area / union_area
 
 
-license_detection = YOLO(os.path.join('vehicle','models', 'license_detection.pt')).to(device)
-char_detection_model = YOLO(os.path.join('vehicle','models', 'alpha_detection.pt')).to(device)
+license_detection = YOLO(os.path.join('vehicle','models', 'license_model.pt')).to(device)
+char_detection_model = YOLO(os.path.join('vehicle','models', 'char_detection.pt')).to(device)
 
 
 def map_to_classes_names(sorted_pair):

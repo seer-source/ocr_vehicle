@@ -281,7 +281,7 @@ class VideoProcessor:
         # cv2.polylines(annotated_frame, [np.array(self.object_tracker.convert_to_absolute_points(self.polygon_points, width, height), dtype=np.int32)], isClosed=True, color=(0, 255, 0), thickness=2)
         return cv2.resize(annotated_frame, (640, 640))
 
-tracker=ObjectTracker('vehicle/models/tracker.pt',[])
+tracker=ObjectTracker('vehicle/models/object_tracker.pt',[])
 
 video_process=VideoProcessor(tracker,detect_vehicle)
 
