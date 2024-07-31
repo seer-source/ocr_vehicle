@@ -204,7 +204,7 @@ class ObjectTracker:
             license_prediction = ' '.join([char for char, confidence in predictions])
             # print('license_prediction with the best accurate',license_prediction)
             best_license_plate,frame=get_highest_confidence_license_plate(self.results_of_prediction)
-            callback(camera_id,frame,best_license_plate,license_prediction)
+            callback(camera_id,frame,cv2.cvtColor(best_license_plate,cv2.COLOR_BGR2RGB),license_prediction)
             self.results_of_prediction=[]
             return True
         
