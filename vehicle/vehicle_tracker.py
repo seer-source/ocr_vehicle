@@ -7,9 +7,12 @@ import io
 import time
 from .license_detection import process_image_and_get_results
 import os
+
 # Initialize logging
 from app_resources.utils  import detect_vehicle
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def process_single_license_result(result):
     # Extract license confidence
     license_confidence = result['license_confidence'].item()
@@ -32,6 +35,7 @@ def get_highest_confidence_chars(predictions):
     ]
     
     return highest_confidence_chars
+
 class Detections:
     def __init__(self, xyxy, mask, confidence, class_id, tracker_id, data):
         self.xyxy = xyxy
@@ -60,19 +64,20 @@ def convert_detections_to_dict(detections_list):
         detections_dict['data'].append(detection.data)
 
     return detections_dict
+
 def get_highest_confidence_license_plate(data):
     highest_confidence = -1
     best_license_plate = None
-    frame=None
+    frame = None
     
     for entry in data:
         confidence = entry['license_confidence'].item()  # Convert tensor to float
         if confidence > highest_confidence:
             highest_confidence = confidence
             best_license_plate = entry['license_plate']
-            frame=entry['frame']
+            frame = entry['frame']
     
-    return best_license_plate,frame
+    return best_license_plate, frame
 
 class TrackInfo:
     def __init__(self, track_id, initial_box, cls, confidence):
@@ -83,6 +88,7 @@ class TrackInfo:
         self.direction_determined = False
         self.max_confidence = confidence
         self.most_confident_class = cls
+        self.initial_box = initial_box  # Store the initial box
 
     def update_box(self, new_box):
         self.boxes.append(new_box)
@@ -94,7 +100,7 @@ class TrackInfo:
             self.max_confidence = confidence
             self.most_confident_class = cls
 
-    def determine_status(self):
+    def determine_status(self, half_height, quarter_height):
         if len(self.boxes) < 15 or self.direction_determined:
             return
 
@@ -107,9 +113,9 @@ class TrackInfo:
         delta_y = end_y - start_y
         logging.info(f"Track {self.track_id} - start_y: {start_y}, end_y: {end_y}, delta_y: {delta_y}")
 
-        if start_y < end_y:
+        if start_y < end_y and start_y < (half_height + quarter_height):
             self.status = "coming_on"
-        elif start_y > end_y:
+        elif start_y > end_y and start_y > (half_height - quarter_height):
             self.status = "going_off"
 
         self.direction_determined = True
@@ -122,7 +128,7 @@ class ObjectTracker:
         self.valid_classes = ["car", "truck", "bus"]  # List of valid classes
         self.validated = set()  # Set to keep track of validated track IDs
         self.processed = set()  # Set to keep track of processed track IDs
-        self.results_of_prediction=[]
+        self.results_of_prediction = []
 
     def track(self, frame):
         return self.model.track(frame, persist=True)
@@ -199,34 +205,33 @@ class ObjectTracker:
         y2 = min(frame.shape[0], int(y + h / 2))
         return frame[y1:y2, x1:x2]
 
-    def validate(self,main_frame,camera_id, image,callback):
-        if len(self.results_of_prediction)>=3:
-            predictions=get_highest_confidence_chars(self.results_of_prediction)
+    def validate(self, trackId, main_frame, camera_id, image, callback):
+        if len(self.results_of_prediction) >= 3:
+            predictions = get_highest_confidence_chars(self.results_of_prediction)
             license_prediction = ' '.join([char for char, confidence in predictions])
-            # print('license_prediction with the best accurate',license_prediction)
-            best_license_plate,frame=get_highest_confidence_license_plate(self.results_of_prediction)
-            callback(camera_id,frame,cv2.cvtColor(best_license_plate,cv2.COLOR_BGR2RGB),license_prediction)
-            self.results_of_prediction=[]
+            best_license_plate, frame = get_highest_confidence_license_plate(self.results_of_prediction)
+            callback(trackId, camera_id, frame, cv2.cvtColor(best_license_plate, cv2.COLOR_BGR2RGB), license_prediction)
+            self.results_of_prediction = []
             return True
         
-        dict_of_results  = process_image_and_get_results(main_frame,image)
+        dict_of_results = process_image_and_get_results(main_frame, image)
         
-        if len(dict_of_results['license_confidence'].flatten().tolist())==0:
+        if len(dict_of_results['license_confidence'].flatten().tolist()) == 0:
             return False
         self.results_of_prediction.append(dict_of_results)
         return False
 
 class VideoProcessor:
-    def __init__(self, object_tracker,callback):
-        # self.cap = cv2.VideoCapture(video_path)
+    def __init__(self, object_tracker, callback):
         self.object_tracker = object_tracker
-        # self.polygon_points = polygon_points
         self.display_initialized = False
-        self.callback=callback
+        self.callback = callback
 
-    def process_frame(self, camera_id,frame):
+    def process_frame(self, camera_id, frame):
         clean_frame = frame.copy()  # Create a clean copy of the frame for cropping
         height, width = frame.shape[:2]
+        half_height = height / 2
+        quarter_height = height / 4
         results = self.object_tracker.track(frame)
         if not results[0].boxes.is_track:
             return cv2.resize(frame, (640, 640))
@@ -238,13 +243,10 @@ class VideoProcessor:
         self.object_tracker.update_tracks(boxes, track_ids, classes, confidences)
         for track in self.object_tracker.tracks.values():
             if not track.direction_determined:
-                track.determine_status()
+                track.determine_status(half_height, quarter_height)
                 logging.info(f"Track ID: {track.track_id}, Status: {track.status}, Class: {track.most_confident_class}")
 
         annotated_frame = self.object_tracker.draw_tracks(frame, boxes)
-        
-        half_height = height / 2
-
         track_ids_to_remove = []
 
         for track_id, track in list(self.object_tracker.tracks.items()):
@@ -260,43 +262,41 @@ class VideoProcessor:
             cv2.circle(frame, (int(x), int(rear_edge_y)), 5, (0, 0, 255), -1)  # Red for rear edge
 
             if track.status == "coming_on":
-                if front_edge_y > half_height+(height/4):
+                if front_edge_y > half_height + quarter_height:
                     if track.track_id not in self.object_tracker.validated:
                         cropped_object = self.object_tracker.crop_object(clean_frame, track.boxes[-1])
-                        if self.object_tracker.validate(clean_frame,camera_id,cropped_object,self.callback):
+                        if self.object_tracker.validate(track.track_id, clean_frame, track.status, cropped_object, self.callback):
                             self.object_tracker.validated.add(track.track_id)
-                            # cv2.imwrite(f"coming_on_cropped_{track.track_id}.jpg", cropped_object)
                             track_ids_to_remove.append(track.track_id)
             elif track.status == "going_off":
-                if front_edge_y < half_height+(height/4):
+                if front_edge_y < half_height + quarter_height:
                     if track.track_id not in self.object_tracker.validated:
                         cropped_object = self.object_tracker.crop_object(clean_frame, track.boxes[-1])
-                        if self.object_tracker.validate(clean_frame,camera_id,cropped_object,self.callback):
+                        if self.object_tracker.validate(track.track_id, clean_frame, track.status, cropped_object, self.callback):
                             self.object_tracker.validated.add(track.track_id)
-                            # cv2.imwrite(f"going_off_cropped_{track.track_id}.jpg", cropped_object)
                             track_ids_to_remove.append(track.track_id)
                             
         for track_id in track_ids_to_remove:
             self.object_tracker.clear_track_id(track_id)
 
-        # cv2.polylines(annotated_frame, [np.array(self.object_tracker.convert_to_absolute_points(self.polygon_points, width, height), dtype=np.int32)], isClosed=True, color=(0, 255, 0), thickness=2)
-        return annotated_frame
+        return cv2.resize(annotated_frame, (620, 620))
 
-tracker=ObjectTracker(os.path.join('vehicle','models','object_tracker.pt'),[])
+tracker = ObjectTracker(os.path.join('vehicle','models', 'car_tracker.pt'), [])
+
 # import os
 # from uuid import uuid1
-# def save_tracks(camera_id,frame,license_img,chars):
-#     os.makedirs('stored',exist_ok=True)
-#     image_id=str(uuid1())
-#     cv.imwrite(f"stored/frame_{image_id}_.jpg",frame)
-#     cv.imwrite(f"stored/license_img_{chars}__{image_id}_.jpg",license_img)
-    
 
-video_process=VideoProcessor(tracker,detect_vehicle)
+# def save_tracks(trackId, camera_id, frame, license_img, chars):
+#     os.makedirs('stored', exist_ok=True)
+#     image_id = str(uuid1())
+#     cv2.imwrite(f"stored/{camera_id}___{trackId}__frame_{image_id}_.jpg", frame)
+#     cv2.imwrite(f"stored/{camera_id}__{trackId}__license_img_{chars}__{image_id}_.jpg", license_img)
+
+video_process = VideoProcessor(tracker, detect_vehicle)
 
 # import cv2 as cv
 
-# cap=cv.VideoCapture('vehicle/Cars All.mp4')
+# cap = cv.VideoCapture('Cars All-in one/Cars All.mov')
 # if not cap.isOpened():
 #     print("Error: Could not open video file.")
 # while cap.isOpened():
@@ -304,15 +304,10 @@ video_process=VideoProcessor(tracker,detect_vehicle)
 #     if not ret:
 #         print("Reached end of video or there is an issue with the video file.")
 #         break
-#     frame=video_process.process_frame('camera_id one ',frame)
+#     frame = video_process.process_frame('camera_id one', frame)
 #     cv.imshow('Video Frame', frame)
 #     if cv.waitKey(25) & 0xFF == ord('q'):
 #         break
 
-
-
-
-
 # cap.release()
-# # Close all OpenCV windows
 # cv.destroyAllWindows()
