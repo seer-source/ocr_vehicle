@@ -281,7 +281,7 @@ class VideoProcessor:
 
         return cv2.resize(annotated_frame, (620, 620))
 
-tracker = ObjectTracker(os.path.join('vehicle','models', 'car_tracker.pt'), [])
+tracker = ObjectTracker(os.path.join('vehicle','models', 'object_tracker.pt'), [])
 
 # import os
 # from uuid import uuid1
@@ -292,11 +292,11 @@ tracker = ObjectTracker(os.path.join('vehicle','models', 'car_tracker.pt'), [])
 #     cv2.imwrite(f"stored/{camera_id}___{trackId}__frame_{image_id}_.jpg", frame)
 #     cv2.imwrite(f"stored/{camera_id}__{trackId}__license_img_{chars}__{image_id}_.jpg", license_img)
 
-video_process = VideoProcessor(tracker, detect_vehicle)
+video_process = VideoProcessor(tracker,detect_vehicle)
 
 # import cv2 as cv
 
-# cap = cv.VideoCapture('Cars All-in one/Cars All.mov')
+# cap = cv.VideoCapture('vehicle/Cars All.mp4')
 # if not cap.isOpened():
 #     print("Error: Could not open video file.")
 # while cap.isOpened():
